@@ -22,8 +22,11 @@ import java.util.Set;
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.util.CreateServerAttributesUtility;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
@@ -242,7 +245,7 @@ public class ServerModel implements IServerModel {
 		Set<String> required = util.listAttributes();
 		for( String attrKey : required ) {
 			if( map.get(attrKey) == null ) {
-				return new Status(IStatus.ERROR, "org.jboss.tools.rsp.server", "Attribute " + attrKey + " must not be null");
+				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Attribute " + attrKey + " must not be null");
 			}
 			Object v = map.get(attrKey);
 			Class actual = v.getClass();
@@ -316,7 +319,7 @@ public class ServerModel implements IServerModel {
 	}
 	
 	@Override
-	public void fireServerStateChanged(IServer server, int state) {
+	public void fireServerStateChanged(IServer server, ServerState state) {
 		for( IServerModelListener l : listeners ) {
 			l.serverStateChanged(toHandle(server), state);
 		}
@@ -484,4 +487,58 @@ public class ServerModel implements IServerModel {
 		}
 		return null;
 	}
+	
+	public IStatus addDeployable(ServerHandle handle, DeployableReference reference) {
+		IServerDelegate s = serverDelegates.get(handle.getId());
+		if( s != null ) {
+			IStatus canAdd = s.canAddDeployable(reference);
+			if( canAdd.isOK()) {
+				s.getServerPublishModel().addDeployable(reference);
+				return Status.OK_STATUS;
+			} else {
+				return canAdd;
+			}
+		}
+		return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+				"Server " + handle.getId() + " not found.");
+	}
+
+	public IStatus removeDeployable(ServerHandle handle, DeployableReference reference) {
+		IServerDelegate s = serverDelegates.get(handle.getId());
+		if( s != null ) {
+			IStatus canRemove = s.canRemoveDeployable(reference);
+			if( canRemove.isOK()) {
+				s.getServerPublishModel().removeDeployable(reference);
+				return Status.OK_STATUS;
+			} else {
+				return canRemove;
+			}
+		}
+		return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+				"Server " + handle.getId() + " not found.");
+	}
+
+	public List<DeployableState> getDeployables(ServerHandle handle) {
+		IServerDelegate s = serverDelegates.get(handle.getId());
+		if( s != null ) {
+			return s.getServerPublishModel().getDeployables();
+		}
+		return new ArrayList<DeployableState>();
+	}
+
+	@Override
+	public IStatus publish(ServerHandle handle, int kind) throws CoreException {
+		IServerDelegate s = serverDelegates.get(handle.getId());
+		if( s != null ) {
+			IStatus canPublish = s.canPublish();
+			if( canPublish != null && canPublish.isOK()) {
+				return s.publish(kind);
+			} else {
+				return new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+						"Server " + handle.getId() + " is not in a state that can be published to: " + canPublish.getMessage());
+			}
+		}
+		return Status.CANCEL_STATUS;
+	}
+
 }

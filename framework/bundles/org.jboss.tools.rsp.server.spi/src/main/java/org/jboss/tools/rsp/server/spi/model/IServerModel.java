@@ -13,8 +13,11 @@ import java.util.Map;
 
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
@@ -55,7 +58,7 @@ public interface IServerModel {
 
 	boolean removeServer(String id);
 
-	void fireServerStateChanged(IServer server, int state);
+	void fireServerStateChanged(IServer server, ServerState state);
 
 	void fireServerProcessTerminated(IServer server, String processId);
 
@@ -75,5 +78,10 @@ public interface IServerModel {
 
 	void saveServers() throws CoreException;
 	
+	List<DeployableState> getDeployables(ServerHandle handle);
+	
+	IStatus addDeployable(ServerHandle handle, DeployableReference reference);
+	IStatus removeDeployable(ServerHandle handle, DeployableReference reference);
 
+	IStatus publish(ServerHandle handle, int kind) throws CoreException;
 }
