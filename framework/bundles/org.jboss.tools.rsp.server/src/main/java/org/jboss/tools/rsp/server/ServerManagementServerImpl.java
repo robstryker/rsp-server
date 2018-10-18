@@ -23,6 +23,8 @@ import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.ClientCapabilitiesRequest;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
 import org.jboss.tools.rsp.api.dao.CreateServerResponse;
+import org.jboss.tools.rsp.api.dao.DeployableReference;
+import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
@@ -32,10 +34,12 @@ import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
+import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
 import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.Status;
 import org.jboss.tools.rsp.api.dao.StopServerAttributes;
+import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
@@ -350,7 +354,7 @@ public class ServerManagementServerImpl implements RSPServer {
 			return (StatusConverter.convert(is));
 		}
 		
-		if(del.getServerState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
+		if(del.getServerRunState() == IServerDelegate.STATE_STOPPED && !attr.isForce()) {
 			IStatus is = new org.jboss.tools.rsp.eclipse.core.runtime.Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 					"The server is already marked as stopped. If you wish to force a stop request, please set the force flag to true.");
 			return (StatusConverter.convert(is));
@@ -391,7 +395,17 @@ public class ServerManagementServerImpl implements RSPServer {
 			return null;
 		}
 	}
+	
+	@Override
+	public CompletableFuture<ServerState> getServerState(ServerHandle handle) {
+		return teeFuture(() -> getServerStateSync(handle));
+	}
 
+	public ServerState getServerStateSync(ServerHandle handle) {
+		IServer is = model.getServerModel().getServer(handle.getId());
+		return is.getDelegate().getServerState();
+	}
+	
 	@Override
 	public CompletableFuture<Status> serverStartingByClient(ServerStartingAttributes attr) {
 		return teeFuture(() -> serverStartingByClientSync(attr));
@@ -509,4 +523,45 @@ public class ServerManagementServerImpl implements RSPServer {
 	<T> CompletableFuture<T> teeFuture(IMethodProvider<T> provider) {
 		return new RSPCompletableFuture<T>().method(provider);
 	}
+
+	@Override
+	public CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle) {
+		return teeFuture(() -> getDeployablesSync(handle));
+	}
+
+	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
+		 return model.getServerModel().getDeployables(handle);
+	}
+
+	
+	public CompletableFuture<Status> addDeployable(ServerHandle handle, DeployableReference reference) {
+		return teeFuture(() -> addDeployableSync(handle, reference));
+	}
+	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
+		IStatus stat = model.getServerModel().addDeployable(handle, reference);
+		return StatusConverter.convert(stat);
+	}
+	
+	public CompletableFuture<Status> removeDeployable(ServerHandle handle, DeployableReference reference) {
+		return teeFuture(() -> removeDeployableSync(handle, reference));
+	}
+	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
+		IStatus stat = model.getServerModel().removeDeployable(handle, reference);
+		return StatusConverter.convert(stat);
+	}
+
+	@Override
+	public CompletableFuture<Status> publish(ServerHandle handle, int kind) {
+		return teeFuture(() -> publishSync(handle, kind));
+	}
+	
+	public Status publishSync(ServerHandle handle, int kind) {
+		try {
+			IStatus stat = model.getServerModel().publish(handle, kind);
+			return StatusConverter.convert(stat);
+		} catch(CoreException ce) {
+			return StatusConverter.convert(ce.getStatus());
+		}
+	}
+	
 }

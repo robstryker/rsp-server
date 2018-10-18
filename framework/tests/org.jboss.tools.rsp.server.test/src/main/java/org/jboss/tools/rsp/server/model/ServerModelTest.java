@@ -42,7 +42,7 @@ public class ServerModelTest {
 	public static void beforeClass() {
 		ORIGINAL_DATA_LOC = System.getProperty(LaunchingCore.SYSPROP_DATA_LOCATION);
 		try {
-			File tmp = Files.createTempDirectory("RSPStartupShutdownTest").toFile();
+			File tmp = Files.createTempDirectory("ServerModelTest").toFile();
 			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, tmp.getAbsolutePath());
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
