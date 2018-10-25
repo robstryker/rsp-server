@@ -16,5 +16,6 @@
   <modules>
     <module>org.jboss.tools.rsp.server.minishift</module>
     <module>org.jboss.tools.rsp.server.wildfly</module>
+    <module>org.jboss.tools.rsp.server.felix</module>
   </modules>
 </project>

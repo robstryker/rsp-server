@@ -298,5 +298,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		};
 	}
 	
-	
+	public ILaunch[] getLaunches() {
+		return (ILaunch[]) launches.toArray(new ILaunch[launches.size()]);
+	}
 }
