@@ -94,7 +94,7 @@ public class ServerDeployableTest {
 			Files.write(s1, initial.getBytes());
 			sm.loadServers(dir.toFile());
 			assertEquals(sm.getServers().size(), expectedSize);
-		} catch (IOException | CoreException e) {
+		} catch (IOException e) {
 			if (s1 != null && s1.toFile().exists()) {
 				s1.toFile().delete();
 				s1.toFile().getParentFile().delete();
@@ -396,17 +396,25 @@ public class ServerDeployableTest {
 					try {
 						startSignal1.await();
 					} catch(InterruptedException ie) {}
-					setModulePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+					setModulePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 					doneSignal1.countDown();
 					
 					try {
 						startSignal2.await();
 					} catch(InterruptedException ie) {}
-					setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
+					setModuleState2(reference, ServerManagementAPIConstants.STATE_STARTED);
 					doneSignal2.countDown();
 				}
 			}.start();
 			return Status.OK_STATUS;
+		}
+		
+		protected void setModulePublishState2(DeployableReference reference, int publishState) {
+			setModulePublishState(reference, publishState);
+		}
+
+		protected void setModuleState2(DeployableReference reference, int runState) {
+			setModuleState(reference, runState);
 		}
 	}
 	private class TestServerDelegate extends AbstractServerDelegate {

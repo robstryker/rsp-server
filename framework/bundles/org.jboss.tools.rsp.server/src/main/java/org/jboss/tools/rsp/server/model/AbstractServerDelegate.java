@@ -15,12 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
-import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
-import org.jboss.tools.rsp.api.dao.StartServerResponse;
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
 import org.jboss.tools.rsp.api.dao.ServerHandle;
+import org.jboss.tools.rsp.api.dao.ServerLaunchMode;
 import org.jboss.tools.rsp.api.dao.ServerStartingAttributes;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.api.dao.ServerType;
@@ -103,8 +102,9 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return new CreateServerValidation(errorStatus(msg, bundle),Collections.emptyList());
 	}
 
-	public IStatus validate() {
-		return Status.OK_STATUS;
+	@Override
+	public CreateServerValidation validate() {
+		return new CreateServerValidation(Status.OK_STATUS, new ArrayList<String>());
 	}
 
 	/**
@@ -265,6 +265,15 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	 */
 	public IStatus canStop() {
 		return Status.OK_STATUS;
+	}
+	
+	protected boolean modesContains(String needle) {
+		if (needle == null) {
+			return false;
+		}
+		ServerLaunchMode[] modes = getServer().getServerType().getLaunchModes();
+		return Arrays.stream(modes).anyMatch(
+				mode -> needle.equals(mode.getMode()));
 	}
 	
 	public StartServerResponse start(String mode) {
