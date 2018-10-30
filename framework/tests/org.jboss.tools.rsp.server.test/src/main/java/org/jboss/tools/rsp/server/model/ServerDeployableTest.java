@@ -12,10 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +31,6 @@ import org.jboss.tools.rsp.api.dao.ServerHandle;
 import org.jboss.tools.rsp.api.dao.ServerState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
-import org.jboss.tools.rsp.eclipse.core.runtime.Status;
 import org.jboss.tools.rsp.launching.LaunchingCore;
 import org.jboss.tools.rsp.launching.utils.IMemento;
 import org.jboss.tools.rsp.launching.utils.JSONMemento;
@@ -45,6 +41,7 @@ import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
 import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 import org.jboss.tools.rsp.server.util.generation.DeploymentGeneration;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -70,8 +67,15 @@ public class ServerDeployableTest {
 			System.setProperty(LaunchingCore.SYSPROP_DATA_LOCATION, ORIGINAL_DATA_LOC);
 	}
 
-	
-	
+	private ServerModel sm;
+	private File war;
+
+	@Before
+	public void before() {
+		this.sm = new ServerModel(mock(IServerManagementModel.class));
+		this.war = createWar(sm);
+	}
+
 	protected File createWar(ServerModel sm) {
 		Path deployments = null;
 		File war = null;
@@ -111,10 +115,8 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testDeployablesAddRemoveNoPublish() {
-		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));
 		sm.addServerType(mockServerType("wonka6"));
-		File serverFile = createDataLoc(sm);
-		File war = createWar(sm);
+		createDataLoc(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
 
 		List<DeployableState> deployables = sm.getDeployables(handle);
@@ -142,10 +144,8 @@ public class ServerDeployableTest {
 	
 	@Test
 	public void testDeployablesAddSaveRemoveSave() {
-		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));;
 		sm.addServerType(mockServerType("wonka6"));
 		File serverFile = createDataLoc(sm);
-		File war = createWar(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
 
 		List<DeployableState> deployables = sm.getDeployables(handle);
@@ -205,10 +205,8 @@ public class ServerDeployableTest {
 	
 	@Test
 	public void testDeployablesLoadFromData() {
-		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));
 		sm.addServerType(mockServerType("wonka6"));
-		File serverFile = createDataLoc(sm, getServerWithDeployableString("abc123", "wonka6"), 1);
-		File war = createWar(sm);
+		createDataLoc(sm, getServerWithDeployableString("abc123", "wonka6"), 1);
 		ServerHandle handle = sm.getServerHandles()[0];
 
 		List<DeployableState> deployables = sm.getDeployables(handle);
@@ -249,10 +247,8 @@ public class ServerDeployableTest {
 
 	@Test
 	public void testDefaultPublishImplementation() {
-		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));
 		sm.addServerType(mockServerType("wonka6"));
 		File serverFile = createDataLoc(sm);
-		File war = createWar(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
@@ -300,8 +296,7 @@ public class ServerDeployableTest {
 	public void testDefaultPublishImplementationWithDelay() {
 		ServerModel sm = new ServerModel(mock(IServerManagementModel.class));
 		sm.addServerType(mockServerType("wonka6", 2));
-		File serverFile = createDataLoc(sm);
-		File war = createWar(sm);
+		createDataLoc(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
