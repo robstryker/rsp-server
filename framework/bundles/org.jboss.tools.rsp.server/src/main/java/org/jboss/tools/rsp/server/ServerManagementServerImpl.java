@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.api.RSPServer;
@@ -503,25 +504,15 @@ public class ServerManagementServerImpl implements RSPServer {
 		return StatusConverter.convert(s);
 	}
 
-	private static interface IMethodProvider<T> {
-		public T method();
-	}
-	
-	private static class RSPCompletableFuture<T> {
-		public CompletableFuture<T> method(IMethodProvider<T> provider) {
-			final RSPClient rspc = ClientThreadLocal.getActiveClient();
-			CompletableFuture<T> completableFuture = new CompletableFuture<>();
-			CompletableFuture.runAsync(() -> {
-				ClientThreadLocal.setActiveClient(rspc);
-				completableFuture.complete(provider.method());
-				ClientThreadLocal.setActiveClient(null);
-			});
-			return completableFuture;
-		}
-	}
-
-	<T> CompletableFuture<T> teeFuture(IMethodProvider<T> provider) {
-		return new RSPCompletableFuture<T>().method(provider);
+	private <T> CompletableFuture<T> teeFuture(Supplier<T> supplier) {
+		final RSPClient rspc = ClientThreadLocal.getActiveClient();
+		CompletableFuture<T> completableFuture = new CompletableFuture<>();
+		CompletableFuture.runAsync(() -> {
+			ClientThreadLocal.setActiveClient(rspc);
+			completableFuture.complete(supplier.get());
+			ClientThreadLocal.setActiveClient(null);
+		});
+		return completableFuture;
 	}
 
 	@Override
