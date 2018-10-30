@@ -400,11 +400,11 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	@Override
 	public CompletableFuture<ServerState> getServerState(ServerHandle handle) {
-		return teeFuture(() -> getServerStateSync(handle));
+		return createCompletableFuture(() -> getServerStateSync(handle));
 	}
 
 	public ServerState getServerStateSync(ServerHandle handle) {
-		IServer is = model.getServerModel().getServer(handle.getId());
+		IServer is = managementModel.getServerModel().getServer(handle.getId());
 		return is.getDelegate().getServerState();
 	}
 	
@@ -504,6 +504,48 @@ public class ServerManagementServerImpl implements RSPServer {
 				IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Parameter is invalid. It may be null, missing required fields, or unacceptable values.");
 		return StatusConverter.convert(s);
 	}
+	
+
+
+	@Override
+	public CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle) {
+		return createCompletableFuture(() -> getDeployablesSync(handle));
+	}
+
+	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
+		 return managementModel.getServerModel().getDeployables(handle);
+	}
+
+	
+	public CompletableFuture<Status> addDeployable(ServerHandle handle, DeployableReference reference) {
+		return createCompletableFuture(() -> addDeployableSync(handle, reference));
+	}
+	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
+		IStatus stat = managementModel.getServerModel().addDeployable(handle, reference);
+		return StatusConverter.convert(stat);
+	}
+	
+	public CompletableFuture<Status> removeDeployable(ServerHandle handle, DeployableReference reference) {
+		return createCompletableFuture(() -> removeDeployableSync(handle, reference));
+	}
+	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
+		IStatus stat = managementModel.getServerModel().removeDeployable(handle, reference);
+		return StatusConverter.convert(stat);
+	}
+
+	@Override
+	public CompletableFuture<Status> publish(ServerHandle handle, int kind) {
+		return createCompletableFuture(() -> publishSync(handle, kind));
+	}
+	
+	public Status publishSync(ServerHandle handle, int kind) {
+		try {
+			IStatus stat = managementModel.getServerModel().publish(handle, kind);
+			return StatusConverter.convert(stat);
+		} catch(CoreException ce) {
+			return StatusConverter.convert(ce.getStatus());
+		}
+	}
 
 	private static <T> CompletableFuture<T> createCompletableFuture(Supplier<T> supplier) {
 		final RSPClient rspc = ClientThreadLocal.getActiveClient();
@@ -515,45 +557,4 @@ public class ServerManagementServerImpl implements RSPServer {
 		});
 		return completableFuture;
 	}
-
-	@Override
-	public CompletableFuture<List<DeployableState>> getDeployables(ServerHandle handle) {
-		return teeFuture(() -> getDeployablesSync(handle));
-	}
-
-	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
-		 return model.getServerModel().getDeployables(handle);
-	}
-
-	
-	public CompletableFuture<Status> addDeployable(ServerHandle handle, DeployableReference reference) {
-		return teeFuture(() -> addDeployableSync(handle, reference));
-	}
-	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
-		IStatus stat = model.getServerModel().addDeployable(handle, reference);
-		return StatusConverter.convert(stat);
-	}
-	
-	public CompletableFuture<Status> removeDeployable(ServerHandle handle, DeployableReference reference) {
-		return teeFuture(() -> removeDeployableSync(handle, reference));
-	}
-	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
-		IStatus stat = model.getServerModel().removeDeployable(handle, reference);
-		return StatusConverter.convert(stat);
-	}
-
-	@Override
-	public CompletableFuture<Status> publish(ServerHandle handle, int kind) {
-		return teeFuture(() -> publishSync(handle, kind));
-	}
-	
-	public Status publishSync(ServerHandle handle, int kind) {
-		try {
-			IStatus stat = model.getServerModel().publish(handle, kind);
-			return StatusConverter.convert(stat);
-		} catch(CoreException ce) {
-			return StatusConverter.convert(ce.getStatus());
-		}
-	}
-	
 }

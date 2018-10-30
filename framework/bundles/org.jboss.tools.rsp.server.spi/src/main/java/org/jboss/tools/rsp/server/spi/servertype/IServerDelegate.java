@@ -263,7 +263,7 @@ public interface IServerDelegate {
 	 * @return
 	 * @throws CoreException 
 	 */
-	public IStatus publish(int kind) throws CoreException;
+	public IStatus publish(int kind);
 
 	/**
 	 * Get the server state, including run state, publish state, 

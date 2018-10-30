@@ -33,6 +33,7 @@ import org.jboss.tools.rsp.eclipse.debug.core.IDebugEventSetListener;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.eclipse.debug.core.IStreamListener;
 import org.jboss.tools.rsp.eclipse.debug.core.model.IProcess;
+import org.jboss.tools.rsp.eclipse.osgi.util.NLS;
 import org.jboss.tools.rsp.launching.RuntimeProcessEventManager;
 import org.jboss.tools.rsp.launching.utils.StatusConverter;
 import org.jboss.tools.rsp.server.ServerCoreActivator;
@@ -386,21 +387,33 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	}
 	
 	@Override
-	public IStatus publish(int publishType) throws CoreException {
-		// TODO add some error handling, make sure publishFinish is always called
-		
-		publishStart(publishType);
-		
-		List<DeployableState> list = getServerPublishModel().getDeployables();
+	public IStatus publish(int publishType) {
 		MultiStatus ms = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, "Publishing server " + getServer().getName(), null);
-		for( DeployableState state : list ) {
-			int iState = state.getPublishState();
-			IStatus tmp = publishModule(state.getReference(), publishType, iState);
-			ms.add(tmp);
+		try {
+			publishStart(publishType);
+			List<DeployableState> list = getServerPublishModel().getDeployables();
+			for( DeployableState state : list ) {
+				try {
+					int iState = state.getPublishState();
+					publishModule(state.getReference(), publishType, iState);
+				} catch(CoreException ce) {
+					String mod = state.getReference().getId();
+					String server = getServer().getName();
+					ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+							NLS.bind("Error while publishing module {0} to server {1}", mod, server), ce)); 
+				}
+			}
+		} catch(CoreException ce) {
+			ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+					NLS.bind("Error publishing to server {0}", getServer().getName()), ce));
+		} finally {
+			try {
+				publishFinish(publishType);
+			} catch(CoreException ce) {
+				ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
+						NLS.bind("Error completing publishing to server {0}", getServer().getName()), ce));
+			}
 		}
-		
-		
-		publishFinish(publishType);
 		
 		return ms;
 	}
@@ -413,11 +426,10 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		// Clients override
 	}
 
-	protected IStatus publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+	protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 		// Clients should override this default implementation
 		setModulePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
-		return Status.OK_STATUS;
 	}
 
 	protected void setModulePublishState(DeployableReference reference, int publishState) {
