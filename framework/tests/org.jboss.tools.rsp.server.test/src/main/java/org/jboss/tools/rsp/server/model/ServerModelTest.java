@@ -225,7 +225,9 @@ public class ServerModelTest {
 			assertEquals(sm.getServers().size(), 1);
 			assertNotNull(sm.getServer("abc123"));
 			assertTrue(added[0].booleanValue());
-			sm.removeServer("abc123");
+			IServer server = sm.getServer("abc123");
+
+			sm.removeServer(server);
 			assertEquals(sm.getServers().size(), 0);
 			assertNull(sm.getServer("abc123"));
 			assertTrue(removed[0].booleanValue());
@@ -243,7 +245,9 @@ public class ServerModelTest {
 			assertEquals(sm.getServers().size(), 1);
 			assertNotNull(sm.getServer("abc123"));
 			assertFalse(added[0].booleanValue());
-			sm.removeServer("abc123");
+			
+			server = sm.getServer("abc123");
+			sm.removeServer(server);
 			assertEquals(sm.getServers().size(), 0);
 			assertNull(sm.getServer("abc123"));
 			assertFalse(removed[0].booleanValue());

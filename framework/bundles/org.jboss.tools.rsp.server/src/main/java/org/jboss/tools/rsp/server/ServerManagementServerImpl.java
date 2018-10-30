@@ -51,6 +51,7 @@ import org.jboss.tools.rsp.server.spi.client.ClientThreadLocal;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerType;
 
 public class ServerManagementServerImpl implements RSPServer {
 	
@@ -201,8 +202,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( handle == null || isEmpty(handle.getId())) {
 			return invalidParameterStatus();
 		}
-		
-		boolean b = managementModel.getServerModel().removeServer(handle.getId());
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		boolean b = managementModel.getServerModel().removeServer(server);
 		return booleanToStatus(b, "Server not removed: " + handle.getId());
 	}
 
@@ -215,7 +216,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
 		}
-		Attributes rspa = managementModel.getServerModel().getRequiredAttributes(type.getId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(type.getId());
+		Attributes rspa = managementModel.getServerModel().getRequiredAttributes(serverType);
 		return rspa;
 	}
 
@@ -228,7 +230,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId())) {
 			return null;
 		}
-		return managementModel.getServerModel().getOptionalAttributes(type.getId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(type.getId());
+		return managementModel.getServerModel().getOptionalAttributes(serverType);
 	}
 	
 	@Override
@@ -240,8 +243,9 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( type == null || isEmpty(type.getId()) ) {
 			return null;
 		}
+		IServerType serverType = managementModel.getServerModel().getIServerType(type.getId());
 		List<ServerLaunchMode> l = managementModel.getServerModel()
-				.getLaunchModes(type.getId());
+				.getLaunchModes(serverType);
 		return l;
 	}
 	
@@ -253,7 +257,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
 		}
-		Attributes rspa = managementModel.getServerModel().getRequiredLaunchAttributes(req.getServerTypeId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(req.getServerTypeId());
+		Attributes rspa = managementModel.getServerModel().getRequiredLaunchAttributes(serverType);
 		return rspa;
 	}
 
@@ -266,7 +271,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		if( req == null || isEmpty(req.getServerTypeId()) || isEmpty(req.getMode())) {
 			return null;
 		}
-		Attributes rspa = managementModel.getServerModel().getOptionalLaunchAttributes(req.getServerTypeId());
+		IServerType serverType = managementModel.getServerModel().getIServerType(req.getServerTypeId());
+		Attributes rspa = managementModel.getServerModel().getOptionalLaunchAttributes(serverType);
 		return rspa;
 	}
 	
@@ -513,7 +519,8 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	public List<DeployableState> getDeployablesSync(ServerHandle handle) {
-		 return managementModel.getServerModel().getDeployables(handle);
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		 return managementModel.getServerModel().getDeployables(server);
 	}
 
 	
@@ -521,7 +528,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		return createCompletableFuture(() -> addDeployableSync(handle, reference));
 	}
 	public Status addDeployableSync(ServerHandle handle, DeployableReference reference) {
-		IStatus stat = managementModel.getServerModel().addDeployable(handle, reference);
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		IStatus stat = managementModel.getServerModel().addDeployable(server, reference);
 		return StatusConverter.convert(stat);
 	}
 	
@@ -529,7 +537,8 @@ public class ServerManagementServerImpl implements RSPServer {
 		return createCompletableFuture(() -> removeDeployableSync(handle, reference));
 	}
 	public Status removeDeployableSync(ServerHandle handle, DeployableReference reference) {
-		IStatus stat = managementModel.getServerModel().removeDeployable(handle, reference);
+		IServer server = managementModel.getServerModel().getServer(handle.getId());
+		IStatus stat = managementModel.getServerModel().removeDeployable(server, reference);
 		return StatusConverter.convert(stat);
 	}
 
@@ -540,7 +549,8 @@ public class ServerManagementServerImpl implements RSPServer {
 	
 	public Status publishSync(ServerHandle handle, int kind) {
 		try {
-			IStatus stat = managementModel.getServerModel().publish(handle, kind);
+			IServer server = managementModel.getServerModel().getServer(handle.getId());
+			IStatus stat = managementModel.getServerModel().publish(server, kind);
 			return StatusConverter.convert(stat);
 		} catch(CoreException ce) {
 			return StatusConverter.convert(ce.getStatus());

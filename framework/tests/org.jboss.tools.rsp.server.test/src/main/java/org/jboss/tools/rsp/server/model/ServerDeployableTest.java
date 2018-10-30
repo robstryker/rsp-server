@@ -118,25 +118,25 @@ public class ServerDeployableTest {
 		sm.addServerType(mockServerType("wonka6"));
 		createDataLoc(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
-
-		List<DeployableState> deployables = sm.getDeployables(handle);
+		IServer server = sm.getServer(handle.getId());
+		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 0);
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
-		IStatus added = sm.addDeployable(handle, reference);
+		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
-		deployables = sm.getDeployables(handle);
+		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 1);
 
-		IStatus removed = sm.removeDeployable(handle, reference);
+		IStatus removed = sm.removeDeployable(server, reference);
 		assertNotNull(removed);
 		assertTrue(removed.isOK());
 
-		deployables = sm.getDeployables(handle);
+		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 0);
 
@@ -147,17 +147,18 @@ public class ServerDeployableTest {
 		sm.addServerType(mockServerType("wonka6"));
 		File serverFile = createDataLoc(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
+		IServer server = sm.getServer(handle.getId());
 
-		List<DeployableState> deployables = sm.getDeployables(handle);
+		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 0);
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
-		IStatus added = sm.addDeployable(handle, reference);
+		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
-		deployables = sm.getDeployables(handle);
+		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 1);
 
@@ -179,11 +180,11 @@ public class ServerDeployableTest {
 		
 		
 
-		IStatus removed = sm.removeDeployable(handle, reference);
+		IStatus removed = sm.removeDeployable(server, reference);
 		assertNotNull(removed);
 		assertTrue(removed.isOK());
 
-		deployables = sm.getDeployables(handle);
+		deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 0);
 		
@@ -208,8 +209,9 @@ public class ServerDeployableTest {
 		sm.addServerType(mockServerType("wonka6"));
 		createDataLoc(sm, getServerWithDeployableString("abc123", "wonka6"), 1);
 		ServerHandle handle = sm.getServerHandles()[0];
+		IServer server = sm.getServer(handle.getId());
 
-		List<DeployableState> deployables = sm.getDeployables(handle);
+		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 1);
 
@@ -250,13 +252,14 @@ public class ServerDeployableTest {
 		sm.addServerType(mockServerType("wonka6"));
 		File serverFile = createDataLoc(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
+		IServer server = sm.getServer(handle.getId());
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
-		IStatus added = sm.addDeployable(handle, reference);
+		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
-		List<DeployableState> deployables = sm.getDeployables(handle);
+		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 1);
 		
@@ -271,7 +274,7 @@ public class ServerDeployableTest {
 		
 		// Now do the publish
 		try {
-			sm.publish(handle, ServerManagementAPIConstants.PUBLISH_FULL);
+			sm.publish(server, ServerManagementAPIConstants.PUBLISH_FULL);
 		} catch(CoreException ce) {
 			fail(ce.getMessage());
 		}
@@ -298,13 +301,14 @@ public class ServerDeployableTest {
 		sm.addServerType(mockServerType("wonka6", 2));
 		createDataLoc(sm);
 		ServerHandle handle = sm.getServerHandles()[0];
+		IServer server = sm.getServer(handle.getId());
 
 		DeployableReference reference = new DeployableReference("some.name", war.getAbsolutePath());
-		IStatus added = sm.addDeployable(handle, reference);
+		IStatus added = sm.addDeployable(server, reference);
 		assertNotNull(added);
 		assertTrue(added.isOK());
 
-		List<DeployableState> deployables = sm.getDeployables(handle);
+		List<DeployableState> deployables = sm.getDeployables(server);
 		assertNotNull(deployables);
 		assertTrue(deployables.size() == 1);
 		
@@ -324,7 +328,7 @@ public class ServerDeployableTest {
 		doneSignal2 = new CountDownLatch(1);
 
 		try {
-			sm.publish(handle, ServerManagementAPIConstants.PUBLISH_FULL);
+			sm.publish(server, ServerManagementAPIConstants.PUBLISH_FULL);
 		} catch(CoreException ce) {
 			fail(ce.getMessage());
 		}

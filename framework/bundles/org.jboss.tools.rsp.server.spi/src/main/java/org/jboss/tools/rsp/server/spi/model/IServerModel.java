@@ -34,7 +34,6 @@ public interface IServerModel {
 	ServerType[] getServerTypes();
 	
 	ServerType[] getAccessibleServerTypes();
-	
 
 	IServer getServer(String id);
 	
@@ -44,19 +43,19 @@ public interface IServerModel {
 
 	ServerHandle[] getServerHandles();
 
-	Attributes getRequiredAttributes(String id);
+	Attributes getRequiredAttributes(IServerType serverType);
 
-	Attributes getOptionalAttributes(String id);
+	Attributes getOptionalAttributes(IServerType serverType);
 
-	List<ServerLaunchMode> getLaunchModes(String serverType);
+	List<ServerLaunchMode> getLaunchModes(IServerType serverType);
 	
-	Attributes getRequiredLaunchAttributes(String id);
+	Attributes getRequiredLaunchAttributes(IServerType serverType);
 
-	Attributes getOptionalLaunchAttributes(String id);
+	Attributes getOptionalLaunchAttributes(IServerType serverType);
 
 	CreateServerResponse createServer(String serverType, String id, Map<String, Object> attributes);
 
-	boolean removeServer(String id);
+	boolean removeServer(IServer server);
 
 	void fireServerStateChanged(IServer server, ServerState state);
 
@@ -78,10 +77,10 @@ public interface IServerModel {
 
 	void saveServers() throws CoreException;
 	
-	List<DeployableState> getDeployables(ServerHandle handle);
+	List<DeployableState> getDeployables(IServer server);
 	
-	IStatus addDeployable(ServerHandle handle, DeployableReference reference);
-	IStatus removeDeployable(ServerHandle handle, DeployableReference reference);
+	IStatus addDeployable(IServer server, DeployableReference reference);
+	IStatus removeDeployable(IServer server, DeployableReference reference);
 
-	IStatus publish(ServerHandle handle, int kind) throws CoreException;
+	IStatus publish(IServer server, int kind) throws CoreException;
 }
