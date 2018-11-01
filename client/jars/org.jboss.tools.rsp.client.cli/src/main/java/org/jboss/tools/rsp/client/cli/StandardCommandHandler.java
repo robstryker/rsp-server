@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.jboss.tools.rsp.api.ServerManagementAPIConstants;
 import org.jboss.tools.rsp.api.dao.Attribute;
 import org.jboss.tools.rsp.api.dao.Attributes;
 import org.jboss.tools.rsp.api.dao.CommandLineDetails;
@@ -131,7 +132,7 @@ public class StandardCommandHandler implements InputHandler {
 				}
 			}
 
-		} else if (s.startsWith(START_SERVER)) {
+		} else if (s.startsWith(START_SERVER) || s.startsWith(START_SERVER.substring(0, START_SERVER.length()-2))) {
 			runStartServer(s);
 		} else if (s.equals(LAUNCH_COMMAND)) {
 			LaunchParameters getLaunchReq = getLaunchCommandRequest();
@@ -209,14 +210,29 @@ public class StandardCommandHandler implements InputHandler {
 	}
 	
 	private void runStartServer(String s) throws Exception {
-		String suffix = s.substring(START_SERVER.length()).trim();
+		String suffix = s.substring(START_SERVER.trim().length()).trim();
 		String serverId = suffix;
-		ServerHandle handle = findServer(serverId);
-		if (handle == null) {
+		ServerHandle selected = null;
+		if( serverId.isEmpty()) {
+			selected = assistant.selectServer();
+			if( selected != null ) {
+				serverId = selected.getId();
+			}
+		}
+		
+		if( serverId == null || serverId.isEmpty()) {
+			System.out.println("No server chosen.");
+			return;
+		}
+		
+		if( selected == null ) {
+			selected = findServer(serverId);
+		}
+		if (selected == null) {
 			System.out.println("Server " + serverId + " not found.");
 		} else {
-			String mode = assistant.selectLaunchMode(handle.getType());
-			ServerAttributes sa = new ServerAttributes(handle.getType().getId(), handle.getId(), new HashMap<String,Object>());
+			String mode = assistant.selectLaunchMode(selected.getType());
+			ServerAttributes sa = new ServerAttributes(selected.getType().getId(), selected.getId(), new HashMap<String,Object>());
 			LaunchParameters params = new LaunchParameters(sa, mode);
 			StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
 			System.out.println(stat.getStatus().toString());
@@ -262,9 +278,18 @@ public class StandardCommandHandler implements InputHandler {
 			ServerHandle server = assistant.selectServer();
 			if( server != null ) {
 				List<DeployableState> deployables = launcher.getServerProxy().getDeployables(server).get();
+				System.out.println(deployables.size() + " deployments found:");
 				int c = 1;
 				for( DeployableState ds : deployables ) {
-					System.out.println(c++ + ") " + ds.getReference().getId()); // TODO add state?
+					int pubState = ds.getPublishState();
+					String pubStateString = null;
+					if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_ADD) pubStateString = "[add]";
+					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_FULL) pubStateString = "[full]";
+					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_INCREMENTAL) pubStateString = "[inc]";
+					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) pubStateString = "[none]";
+					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) pubStateString = "[remove]";
+					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN) pubStateString = "[unknown]";
+					System.out.println(c++ + ") " + ds.getReference().getId() + " " + pubStateString); // TODO add run state?
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
