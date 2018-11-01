@@ -24,6 +24,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
@@ -244,7 +245,8 @@ public class StandardCommandHandler implements InputHandler {
 			if( server != null ) {
 				DeployableReference ref = assistant.chooseDeployment(server);
 				if( ref != null ) {
-					Status ret = launcher.getServerProxy().removeDeployable(server, ref).get();
+					ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
+					Status ret = launcher.getServerProxy().removeDeployable(req).get();
 					System.out.println(ret.toString());
 				}
 			}
@@ -277,8 +279,9 @@ public class StandardCommandHandler implements InputHandler {
 				String filePath = assistant.nextLine().trim();
 				if( new File(filePath).exists()) {
 					DeployableReference ref = new DeployableReference(filePath, filePath);
-					Status s = launcher.getServerProxy().addDeployable(server, ref).get();
-					System.out.println(s.toString());
+					ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
+					Status ret = launcher.getServerProxy().addDeployable(req).get();
+					System.out.println(ret.toString());
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
