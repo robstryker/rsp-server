@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
@@ -315,12 +316,11 @@ public interface RSPServer {
 	 * The `server/publish` request is sent by the client to the server
 	 * to instruct the server adapter to publish any changes to the backing runtime.
 	 * 
-	 * @param handle
-	 * @param kind
+	 * @param request
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<Status> publish(ServerHandle handle, int kind);
+	public CompletableFuture<Status> publish(PublishServerRequest request);
 	
 
 	

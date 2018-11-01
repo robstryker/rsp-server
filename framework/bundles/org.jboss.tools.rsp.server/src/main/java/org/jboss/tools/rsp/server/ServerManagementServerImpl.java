@@ -29,6 +29,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
 import org.jboss.tools.rsp.api.dao.ServerCapabilitiesResponse;
@@ -543,14 +544,14 @@ public class ServerManagementServerImpl implements RSPServer {
 	}
 
 	@Override
-	public CompletableFuture<Status> publish(ServerHandle handle, int kind) {
-		return createCompletableFuture(() -> publishSync(handle, kind));
+	public CompletableFuture<Status> publish(PublishServerRequest request) {
+		return createCompletableFuture(() -> publishSync(request));
 	}
 	
-	public Status publishSync(ServerHandle handle, int kind) {
+	public Status publishSync(PublishServerRequest request) {
 		try {
-			IServer server = managementModel.getServerModel().getServer(handle.getId());
-			IStatus stat = managementModel.getServerModel().publish(server, kind);
+			IServer server = managementModel.getServerModel().getServer(request.getServer().getId());
+			IStatus stat = managementModel.getServerModel().publish(server, request.getKind());
 			return StatusConverter.convert(stat);
 		} catch(CoreException ce) {
 			return StatusConverter.convert(ce.getStatus());
