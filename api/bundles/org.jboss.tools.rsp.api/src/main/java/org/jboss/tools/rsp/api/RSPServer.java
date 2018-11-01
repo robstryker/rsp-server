@@ -23,6 +23,7 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.api.dao.DiscoveryPath;
 import org.jboss.tools.rsp.api.dao.LaunchAttributesRequest;
 import org.jboss.tools.rsp.api.dao.LaunchParameters;
+import org.jboss.tools.rsp.api.dao.ModifyDeployableRequest;
 import org.jboss.tools.rsp.api.dao.PublishServerRequest;
 import org.jboss.tools.rsp.api.dao.ServerAttributes;
 import org.jboss.tools.rsp.api.dao.ServerBean;
@@ -297,7 +298,7 @@ public interface RSPServer {
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<Status> addDeployable(ServerHandle handle, DeployableReference reference);
+	public CompletableFuture<Status> addDeployable(ModifyDeployableRequest req);
 	
 	/**
 	 * The `server/removeDeployable` request is sent by the client to the server
@@ -309,7 +310,7 @@ public interface RSPServer {
 	 * @return
 	 */
 	@JsonRequest
-	public CompletableFuture<Status> removeDeployable(ServerHandle handle, DeployableReference reference);
+	public CompletableFuture<Status> removeDeployable(ModifyDeployableRequest req);
 	
 
 	/**
