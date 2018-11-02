@@ -17,7 +17,7 @@ public interface IServerPublishModel {
 	
 	
 	/**
-	 * Add a deployable to the list of objects we want published to the server. 
+	 * Adds a deployable to the list of objects we want published to the server. 
 	 * On the next publish request, a publish of this deployable will be attempted. 
 	 *  
 	 * @param reference
@@ -25,27 +25,29 @@ public interface IServerPublishModel {
 	public void addDeployable(DeployableReference reference);
 
 	/**
-	 * Remove a deployable from the list of objects we want published to the server. 
+	 * Removes a deployable from the list of objects we want published to the server. 
 	 * On the next publish request, a removal of this deployable will be attempted. 
 	 *  
 	 * @param reference
+	 * 
+	 * @see #removeDeployable
 	 */
 	public void removeDeployable(DeployableReference reference);
 	
 	/**
-	 * Get a list of the deployables for this server and their current states
+	 * Returns a list of the deployables for this server and their current states
 	 * @return
 	 */
 	public List<DeployableState> getDeployables();
 
 	/**
-	 * Allow the framework to initialize the model from a data store
+	 * Allows the framework to initialize the model from a data store
 	 * @param references
 	 */
 	public void initialize(List<DeployableReference> references);
 
 	/**
-	 * Set the publish state for a module. 
+	 * Sets the publish state for a module. 
 	 * Clients should call this method after publishing to update
 	 * the model with what the current state is.
 	 * @param reference
@@ -54,7 +56,7 @@ public interface IServerPublishModel {
 	public void setModulePublishState(DeployableReference reference, int publishState);
 
 	/**
-	 * Set the run state (starting, started, etc) for a deployment.
+	 * Sets the run state (starting, started, etc) for a deployment.
 	 * Clients should call this method after publishing, 
 	 * stopping, starting, etc a given deployment. 
 	 * 
@@ -64,14 +66,14 @@ public interface IServerPublishModel {
 	public void setModuleState(DeployableReference reference, int runState);
 
 	/**
-	 * Get the current state for the deployment
+	 * Returns the current state for the deployment
 	 * @param reference
 	 * @return
 	 */
 	public DeployableState getDeployableState(DeployableReference reference);
 
 	/**
-	 * Force the model to remove the given deployable from its stores entirely.
+	 * Forces the model to remove the given deployable from its stores entirely.
 	 * @param reference
 	 */
 	public void deployableRemoved(DeployableReference reference);
