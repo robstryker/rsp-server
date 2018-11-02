@@ -23,6 +23,6 @@ export interface ServerType {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }

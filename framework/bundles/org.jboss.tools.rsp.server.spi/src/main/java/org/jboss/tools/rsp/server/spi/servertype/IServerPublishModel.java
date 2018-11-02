@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.jboss.tools.rsp.api.dao.DeployableReference;
 import org.jboss.tools.rsp.api.dao.DeployableState;
+import org.jboss.tools.rsp.eclipse.core.runtime.IStatus;
 
 public interface IServerPublishModel {
 	
@@ -21,25 +22,39 @@ public interface IServerPublishModel {
 	 * On the next publish request, a publish of this deployable will be attempted. 
 	 *  
 	 * @param reference
+	 * @return IStatus#OK if the deployable was added. IStatus.ERROR otherwise.
 	 */
-	public void addDeployable(DeployableReference reference);
+	public IStatus addDeployable(DeployableReference reference);
+
+	/**
+	 * Returns {@code true} if the given reference can be added to this model. This
+	 * is the case if this model does not contain a DeployableReference with the
+	 * same id.
+	 * 
+	 * @param reference
+	 * @return true if the given reference can be added
+	 * 
+	 * @see DeployableReference#getId
+	 */
+	public boolean contains(DeployableReference reference);
 
 	/**
 	 * Removes a deployable from the list of objects we want published to the server. 
 	 * On the next publish request, a removal of this deployable will be attempted. 
 	 *  
 	 * @param reference
+	 * @return IStatus#OK if the deployable was removed. IStatus.ERROR otherwise.
 	 * 
 	 * @see #removeDeployable
 	 */
-	public void removeDeployable(DeployableReference reference);
-	
+	public IStatus removeDeployable(DeployableReference reference);
+
 	/**
 	 * Returns a list of the deployables for this server and their current states
 	 * @return
 	 */
 	public List<DeployableState> getDeployables();
-
+	
 	/**
 	 * Allows the framework to initialize the model from a data store
 	 * @param references
@@ -66,7 +81,9 @@ public interface IServerPublishModel {
 	public void setModuleState(DeployableReference reference, int runState);
 
 	/**
-	 * Returns the current state for the deployment
+	 * Returns the current state for the given deployment. Return {@code null} if
+	 * the deployment doesn't exist yet.
+	 * 
 	 * @param reference
 	 * @return
 	 */

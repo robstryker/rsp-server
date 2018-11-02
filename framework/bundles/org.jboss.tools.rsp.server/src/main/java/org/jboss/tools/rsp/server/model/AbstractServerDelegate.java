@@ -54,11 +54,11 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	
 	private int serverState = STATE_UNKNOWN;
 	private String currentMode = null;
-	private List<ILaunch> launches = new ArrayList<>();
-	protected HashMap<String, Object> sharedData = new HashMap<>();
-	private IServer server;
+	private final List<ILaunch> launches = new ArrayList<>();
+	protected final HashMap<String, Object> sharedData = new HashMap<>();
+	private final IServer server;
 	
-	private ServerPublishStateModel publishModel = new ServerPublishStateModel();
+	private final ServerPublishStateModel publishModel = new ServerPublishStateModel();
 	
 	public AbstractServerDelegate(IServer server) {
 		this.server = server;
@@ -277,11 +277,13 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 				mode -> needle.equals(mode.getMode()));
 	}
 	
+	@Override
 	public StartServerResponse start(String mode) {
 		IStatus s = new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, "Server Start not implemented");
 		return new StartServerResponse(StatusConverter.convert(s), null);
 	}
 
+	@Override
 	public void handleDebugEvents(DebugEvent[] events) {
 		ArrayList<ILaunch> launchList = new ArrayList<>(this.launches);
 		for( int i = 0; i < events.length; i++ ) {
@@ -325,7 +327,6 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 	protected String getProcessId(IProcess p) {
 		return p.getAttribute(PROCESS_ID_KEY);
 	}
-	
 	
 	/*
 	 * Polling utility methods
@@ -406,7 +407,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 						}
 					}
 				} catch(CoreException ce) {
-					String mod = state.getReference().getId();
+					String mod = state.getReference().getLabel();
 					String server = getServer().getName();
 					ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
 							NLS.bind("Error while publishing module {0} to server {1}", mod, server), ce)); 
@@ -453,6 +454,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		return getServerPublishModel().getDeployableState(reference);
 	}
 	
+	@Override
 	public IStatus canPublish() {
 		return Status.OK_STATUS;
 	}

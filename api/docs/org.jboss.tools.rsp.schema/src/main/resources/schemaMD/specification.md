@@ -250,11 +250,11 @@ This endpoint returns the following schema as a return value:
         "trace" : {
           "type" : "string"
         },
-        "ok" : {
-          "type" : "boolean"
-        },
         "plugin" : {
           "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
         }
       }
     }
@@ -270,8 +270,8 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/getDiscoveryPaths
@@ -389,11 +389,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -402,8 +402,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/removeDiscoveryPath
@@ -445,11 +445,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -458,8 +458,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/getServerHandles
@@ -591,11 +591,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -604,8 +604,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/getRequiredAttributes
@@ -781,11 +781,11 @@ This endpoint returns the following schema as a return value:
         "trace" : {
           "type" : "string"
         },
-        "ok" : {
-          "type" : "boolean"
-        },
         "plugin" : {
           "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
         }
       }
     },
@@ -807,8 +807,8 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/getLaunchModes
@@ -1120,11 +1120,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -1133,8 +1133,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/serverStartedByClient
@@ -1200,11 +1200,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -1213,8 +1213,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/getServerState
@@ -1298,7 +1298,7 @@ This endpoint returns the following schema as a return value:
           "reference" : {
             "type" : "object",
             "properties" : {
-              "id" : {
+              "label" : {
                 "type" : "string"
               },
               "path" : {
@@ -1341,7 +1341,7 @@ export interface ServerType {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }</pre></td></tr></table>
 
@@ -1411,11 +1411,11 @@ This endpoint returns the following schema as a return value:
         "trace" : {
           "type" : "string"
         },
-        "ok" : {
-          "type" : "boolean"
-        },
         "plugin" : {
           "type" : "string"
+        },
+        "ok" : {
+          "type" : "boolean"
         }
       }
     },
@@ -1457,8 +1457,8 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }
 
 export interface CommandLineDetails {
@@ -1511,11 +1511,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -1524,8 +1524,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/getDeployables
@@ -1576,7 +1576,7 @@ This endpoint returns a list of the following schema as a return value:
     "reference" : {
       "type" : "object",
       "properties" : {
-        "id" : {
+        "label" : {
           "type" : "string"
         },
         "path" : {
@@ -1598,7 +1598,7 @@ This endpoint returns a list of the following schema as a return value:
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }</pre></td></tr></table>
 
@@ -1637,7 +1637,7 @@ This endpoint takes the following json schemas as parameters:
     "deployable" : {
       "type" : "object",
       "properties" : {
-        "id" : {
+        "label" : {
           "type" : "string"
         },
         "path" : {
@@ -1657,7 +1657,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }
 
@@ -1688,11 +1688,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -1701,8 +1701,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/removeDeployable
@@ -1740,7 +1740,7 @@ This endpoint takes the following json schemas as parameters:
     "deployable" : {
       "type" : "object",
       "properties" : {
-        "id" : {
+        "label" : {
           "type" : "string"
         },
         "path" : {
@@ -1760,7 +1760,7 @@ export interface ServerHandle {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }
 
@@ -1791,11 +1791,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -1804,8 +1804,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/publish
@@ -1881,11 +1881,11 @@ This endpoint returns the following schema as a return value:
     "trace" : {
       "type" : "string"
     },
-    "ok" : {
-      "type" : "boolean"
-    },
     "plugin" : {
       "type" : "string"
+    },
+    "ok" : {
+      "type" : "boolean"
     }
   }
 }</pre></td><td><pre>export interface Status {
@@ -1894,8 +1894,8 @@ This endpoint returns the following schema as a return value:
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }</pre></td></tr></table>
 
 #### server/shutdown
@@ -2134,7 +2134,7 @@ This endpoint takes the following json schemas as parameters:
           "reference" : {
             "type" : "object",
             "properties" : {
-              "id" : {
+              "label" : {
                 "type" : "string"
               },
               "path" : {
@@ -2177,7 +2177,7 @@ export interface ServerType {
 }
 
 export interface DeployableReference {
-    id: string;
+    label: string;
     path: string;
 }</pre></td></tr></table>
 
