@@ -9,6 +9,6 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    ok: boolean;
     plugin: string;
+    ok: boolean;
 }

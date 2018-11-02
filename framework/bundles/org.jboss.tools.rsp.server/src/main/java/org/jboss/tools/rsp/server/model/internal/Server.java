@@ -20,7 +20,6 @@ import org.jboss.tools.rsp.api.dao.DeployableState;
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IProgressMonitor;
 import org.jboss.tools.rsp.launching.utils.IMemento;
-import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.core.internal.SecuredBase;
 import org.jboss.tools.rsp.server.spi.model.IServerManagementModel;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
@@ -78,7 +77,7 @@ public class Server extends SecuredBase implements IServer {
 				while(dsIt.hasNext()) {
 					IMemento oneModule = modules.createChild("module");
 					DeployableState oneState = dsIt.next();
-					oneModule.putString("id", oneState.getReference().getId());
+					oneModule.putString("id", oneState.getReference().getLabel());
 					oneModule.putString("path", oneState.getReference().getPath());
 				}
 			}
