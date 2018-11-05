@@ -1,5 +1,5 @@
 /* tslint:disable */
-// Generated using typescript-generator version 2.2.413 on 2018-11-02 23:26:15.
+// Generated using typescript-generator version 2.2.413 on 2018-11-05 17:44:21.
 
 export interface Attribute {
     type: string;
@@ -114,7 +114,7 @@ export interface ServerState {
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: DeployableState[];
+    deployableStates: DeployableState[];
 }
 
 export interface ServerType {
@@ -134,8 +134,8 @@ export interface Status {
     code: number;
     message: string;
     trace: string;
-    plugin: string;
     ok: boolean;
+    plugin: string;
 }
 
 export interface StopServerAttributes {

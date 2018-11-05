@@ -29,7 +29,7 @@
     "publishState" : {
       "type" : "integer"
     },
-    "moduleState" : {
+    "deployableStates" : {
       "type" : "array",
       "items" : {
         "type" : "object",

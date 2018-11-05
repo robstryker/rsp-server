@@ -112,7 +112,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 	}
 
 	@Override
-	public void setModulePublishState(DeployableReference reference, int publishState) {
+	public void setDeployablePublishState(DeployableReference reference, int publishState) {
 		DeployableState ds = state.get(getKey(reference));
 		DeployableState next = new DeployableState();
 		next.setReference(reference);
@@ -122,7 +122,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 	}
 
 	@Override
-	public void setModuleState(DeployableReference reference, int runState) {
+	public void setDeployableState(DeployableReference reference, int runState) {
 		DeployableState ds = state.get(getKey(reference));
 		DeployableState next = new DeployableState();
 		next.setReference(reference);

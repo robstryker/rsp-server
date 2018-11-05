@@ -2,7 +2,7 @@ export interface ServerState {
     server: ServerHandle;
     state: number;
     publishState: number;
-    moduleState: DeployableState[];
+    deployableStates: DeployableState[];
 }
 
 export interface ServerHandle {

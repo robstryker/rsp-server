@@ -68,7 +68,7 @@ public interface IServerPublishModel {
 	 * @param reference
 	 * @param publishState
 	 */
-	public void setModulePublishState(DeployableReference reference, int publishState);
+	public void setDeployablePublishState(DeployableReference reference, int publishState);
 
 	/**
 	 * Sets the run state (starting, started, etc) for a deployment.
@@ -78,7 +78,7 @@ public interface IServerPublishModel {
 	 * @param reference
 	 * @param runState
 	 */
-	public void setModuleState(DeployableReference reference, int runState);
+	public void setDeployableState(DeployableReference reference, int runState);
 
 	/**
 	 * Returns the current state for the given deployment. Return {@code null} if
