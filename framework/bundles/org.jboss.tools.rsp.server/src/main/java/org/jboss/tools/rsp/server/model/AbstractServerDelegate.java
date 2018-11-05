@@ -138,7 +138,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		ServerState state = new ServerState();
 		state.setServer(handle);
 		state.setState(getServerRunState());
-		state.setModuleState(getServerPublishModel().getDeployables());
+		state.setDeployableStates(getServerPublishModel().getDeployables());
 		return state;
 	}
 	
@@ -396,7 +396,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 			for( DeployableState state : list ) {
 				try {
 					int iState = state.getPublishState();
-					publishModule(state.getReference(), publishType, iState);
+					publishDeployable(state.getReference(), publishType, iState);
 					DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
 					
 					// If module was to be removed, and it was successfully removed, 
@@ -436,18 +436,18 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		// Clients override
 	}
 
-	protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+	protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 		// Clients should override this default implementation
-		setModulePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
-		setModuleState(reference, ServerManagementAPIConstants.STATE_STARTED);
+		setDeployablePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);
 	}
 
-	protected void setModulePublishState(DeployableReference reference, int publishState) {
-		getServerPublishModel().setModulePublishState(reference, publishState);
+	protected void setDeployablePublishState(DeployableReference reference, int publishState) {
+		getServerPublishModel().setDeployablePublishState(reference, publishState);
 	}
 
-	protected void setModuleState(DeployableReference reference, int runState) {
-		getServerPublishModel().setModuleState(reference, runState);
+	protected void setDeployableState(DeployableReference reference, int runState) {
+		getServerPublishModel().setDeployableState(reference, runState);
 	}
 	
 	protected DeployableState getDeployableState(DeployableReference reference) {

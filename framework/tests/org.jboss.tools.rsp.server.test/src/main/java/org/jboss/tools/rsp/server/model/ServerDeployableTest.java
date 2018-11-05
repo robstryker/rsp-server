@@ -304,7 +304,7 @@ public class ServerDeployableTest {
 		assertEquals(1, deployables.size());
 		
 		ServerState ss = server.getDelegate().getServerState();
-		List<DeployableState> dState = ss.getModuleState();
+		List<DeployableState> dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		DeployableState oneState = dState.get(0);
@@ -321,7 +321,7 @@ public class ServerDeployableTest {
 		
 		// Verify module is set to no publish required and module is started
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -350,7 +350,7 @@ public class ServerDeployableTest {
 		assertEquals(1, deployables.size());
 		
 		ServerState ss = server.getDelegate().getServerState();
-		List<DeployableState> dState = ss.getModuleState();
+		List<DeployableState> dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		DeployableState oneState = dState.get(0);
@@ -372,7 +372,7 @@ public class ServerDeployableTest {
 		
 		// Verify module is set to no publish required and module is started
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -387,7 +387,7 @@ public class ServerDeployableTest {
 		} catch(InterruptedException ie) {}
 		
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -402,7 +402,7 @@ public class ServerDeployableTest {
 		} catch(InterruptedException ie) {}
 		
 		ss = server.getDelegate().getServerState();
-		dState = ss.getModuleState();
+		dState = ss.getDeployableStates();
 		assertNotNull(dState);
 		assertEquals(1, dState.size());
 		oneState = dState.get(0);
@@ -423,30 +423,30 @@ public class ServerDeployableTest {
 		public CommandLineDetails getStartLaunchCommand(String mode, ServerAttributes params) {
 			return null;
 		}
-		protected void publishModule(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+		protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
 			new Thread("Test publish") {
 				public void run() {
 					try {
 						startSignal1.await();
 					} catch(InterruptedException ie) {}
-					setModulePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
+					setDeployablePublishState2(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 					doneSignal1.countDown();
 					
 					try {
 						startSignal2.await();
 					} catch(InterruptedException ie) {}
-					setModuleState2(reference, ServerManagementAPIConstants.STATE_STARTED);
+					setDeployableState2(reference, ServerManagementAPIConstants.STATE_STARTED);
 					doneSignal2.countDown();
 				}
 			}.start();
 		}
 		
-		protected void setModulePublishState2(DeployableReference reference, int publishState) {
-			setModulePublishState(reference, publishState);
+		protected void setDeployablePublishState2(DeployableReference reference, int publishState) {
+			setDeployablePublishState(reference, publishState);
 		}
 
-		protected void setModuleState2(DeployableReference reference, int runState) {
-			setModuleState(reference, runState);
+		protected void setDeployableState2(DeployableReference reference, int runState) {
+			setDeployableState(reference, runState);
 		}
 	}
 
