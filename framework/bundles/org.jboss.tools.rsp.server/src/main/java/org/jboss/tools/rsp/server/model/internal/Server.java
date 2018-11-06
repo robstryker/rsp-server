@@ -70,7 +70,7 @@ public class Server extends SecuredBase implements IServer {
 			// just the existence of that module itself. 
 			List<DeployableState> modState = null;
 			IServerPublishModel pubMod = delegate.getServerPublishModel();
-			modState = pubMod == null ? new ArrayList<>() : pubMod.getDeployables();
+			modState = pubMod == null ? new ArrayList<>() : pubMod.getDeployableStates();
 			if( modState != null && modState.size() > 0 ) {
 				IMemento modules = memento.createChild("modules");
 				Iterator<DeployableState> dsIt = modState.iterator();
