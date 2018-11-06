@@ -84,9 +84,12 @@ public class StandardCommandHandler implements InputHandler {
 	private ServerManagementClientLauncher launcher;
 	private InputProvider provider;
 	private PromptAssistant assistant;
-	public StandardCommandHandler(ServerManagementClientLauncher launcher, InputProvider provider) {
+	private IClientShutdownHandler shutdownHandler;
+	public StandardCommandHandler(ServerManagementClientLauncher launcher, 
+			InputProvider provider, IClientShutdownHandler shutdownHandler) {
 		this.launcher = launcher;
 		this.provider = provider;
+		this.shutdownHandler = shutdownHandler;
 		this.assistant = new PromptAssistant(launcher, provider);
 	}
 
@@ -103,8 +106,8 @@ public class StandardCommandHandler implements InputHandler {
 
 		if (s.trim().equals(SHUTDOWN)) {
 			launcher.getServerProxy().shutdown();
-			System.out.println("The server has been shutdown");
-			System.exit(0);
+			provider.output("The server has been shutdown");
+			this.shutdownHandler.shutdown();
 		} else if (s.startsWith(ADD_PATH)) {
 			String suffix = s.substring(ADD_PATH.length());
 			DiscoveryPath dp = new DiscoveryPath(suffix.trim());
@@ -115,20 +118,20 @@ public class StandardCommandHandler implements InputHandler {
 			launcher.getServerProxy().removeDiscoveryPath(dp);
 		} else if (s.trim().equals(LIST_PATHS)) {
 			List<DiscoveryPath> list = launcher.getServerProxy().getDiscoveryPaths().get();
-			System.out.println("Paths:");
+			provider.output("Paths:");
 			if (list != null) {
 				for( DiscoveryPath dp : list) {
-					System.out.println("   " + dp.getFilepath());
+					provider.output("   " + dp.getFilepath());
 				}
 			}
 		} else if (s.startsWith(SEARCH_PATH)) {
 			String suffix = s.substring(SEARCH_PATH.length());
 			DiscoveryPath dp = new DiscoveryPath(suffix.trim());
 			List<ServerBean> beans = launcher.getServerProxy().findServerBeans(dp).get();
-			System.out.println("Beans:");
+			provider.output("Beans:");
 			if (beans != null) {
 				for( ServerBean b : beans) {
-					System.out.println("   " + b.toString());
+					provider.output("   " + b.toString());
 				}
 			}
 
@@ -144,9 +147,9 @@ public class StandardCommandHandler implements InputHandler {
 			runStopServer(s);
 		} else if (s.trim().equals(LIST_SERVER_TYPES)) {
 			List<ServerType> handles = launcher.getServerProxy().getServerTypes().get();
-			System.out.println(handles.size() + " servers found:");
+			provider.output(handles.size() + " servers found:");
 			for( ServerType sh : handles ) {
-				System.out.println("   " + sh.getId() + ": " + sh.getVisibleName());
+				provider.output("   " + sh.getId() + ": " + sh.getVisibleName());
 			}
 						
 		} else if (s.trim().equals(LIST_SERVERTYPE_ATTRIBUTES_REQUIRED)) {
@@ -163,9 +166,9 @@ public class StandardCommandHandler implements InputHandler {
 			}
 		} else if (s.trim().equals(LIST_SERVERS)) {
 			List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
-			System.out.println(handles.size() + " servers found:");
+			provider.output(handles.size() + " servers found:");
 			for( ServerHandle sh : handles ) {
-				System.out.println("   " + sh.getType().getId() + ":" + sh.getId());
+				provider.output("   " + sh.getType().getId() + ":" + sh.getId());
 			}
 		} else if (s.trim().startsWith(REMOVE_SERVER)) {
 			String suffix = s.substring(REMOVE_SERVER.length());
@@ -173,7 +176,7 @@ public class StandardCommandHandler implements InputHandler {
 			if (sh != null)
 				launcher.getServerProxy().deleteServer(sh);
 			else
-				System.out.println("Server not found: " + suffix.trim());
+				provider.output("Server not found: " + suffix.trim());
 		} else if (s.trim().equals(ADD_SERVER)) {
 			runAddServer();
 		} else if (s.trim().equals(LIST_DEPLOYMENTS)) {
@@ -186,7 +189,7 @@ public class StandardCommandHandler implements InputHandler {
 			runPublish();
 		} else if (s.trim().equals(EXIT)) {
 			launcher.closeConnection();
-			System.exit(0);
+			this.shutdownHandler.shutdown();
 		} else {
 			showCommands();
 		}
@@ -196,7 +199,7 @@ public class StandardCommandHandler implements InputHandler {
 		String suffix = s.substring(STOP_SERVER.length()).trim();
 		String trimmed = suffix.trim();
 		if( trimmed.length() == 0 ) {
-			System.out.println("Syntax: stop server servername [boolean:force]");
+			provider.output("Syntax: stop server servername [boolean:force]");
 		} else {
 			String[] split = trimmed.split(" ");
 			boolean force = false;
@@ -205,7 +208,7 @@ public class StandardCommandHandler implements InputHandler {
 			}
 			StopServerAttributes ssa = new StopServerAttributes(split[0], force);
 			Status stat = launcher.getServerProxy().stopServerAsync(ssa).get();
-			System.out.println(stat.toString());
+			provider.output(stat.toString());
 		}
 	}
 	
@@ -221,7 +224,7 @@ public class StandardCommandHandler implements InputHandler {
 		}
 		
 		if( serverId == null || serverId.isEmpty()) {
-			System.out.println("No server chosen.");
+			provider.output("No server chosen.");
 			return;
 		}
 		
@@ -229,13 +232,13 @@ public class StandardCommandHandler implements InputHandler {
 			selected = findServer(serverId);
 		}
 		if (selected == null) {
-			System.out.println("Server " + serverId + " not found.");
+			provider.output("Server " + serverId + " not found.");
 		} else {
 			String mode = assistant.selectLaunchMode(selected.getType());
 			ServerAttributes sa = new ServerAttributes(selected.getType().getId(), selected.getId(), new HashMap<String,Object>());
 			LaunchParameters params = new LaunchParameters(sa, mode);
 			StartServerResponse stat = launcher.getServerProxy().startServerAsync(params).get();
-			System.out.println(stat.getStatus().toString());
+			provider.output(stat.getStatus().toString());
 		}
 	}
 	
@@ -247,7 +250,7 @@ public class StandardCommandHandler implements InputHandler {
 				int publishType = assistant.selectPublishType();
 				if( publishType != -1 ) {
 					Status stat = launcher.getServerProxy().publish(new PublishServerRequest(server, publishType)).get();
-					System.out.println(stat.toString());
+					provider.output(stat.toString());
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
@@ -263,7 +266,7 @@ public class StandardCommandHandler implements InputHandler {
 				if( ref != null ) {
 					ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
 					Status ret = launcher.getServerProxy().removeDeployable(req).get();
-					System.out.println(ret.toString());
+					provider.output(ret.toString());
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
@@ -278,7 +281,7 @@ public class StandardCommandHandler implements InputHandler {
 			ServerHandle server = assistant.selectServer();
 			if( server != null ) {
 				List<DeployableState> deployables = launcher.getServerProxy().getDeployables(server).get();
-				System.out.println(deployables.size() + " deployments found:");
+				provider.output(deployables.size() + " deployments found:");
 				int c = 1;
 				for( DeployableState ds : deployables ) {
 					int pubState = ds.getPublishState();
@@ -289,7 +292,7 @@ public class StandardCommandHandler implements InputHandler {
 					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_NONE) pubStateString = "[none]";
 					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) pubStateString = "[remove]";
 					else if( pubState == ServerManagementAPIConstants.PUBLISH_STATE_UNKNOWN) pubStateString = "[unknown]";
-					System.out.println(c++ + ") " + ds.getReference().getLabel() + " " + pubStateString); // TODO add run state?
+					provider.output(c++ + ") " + ds.getReference().getLabel() + " " + pubStateString); // TODO add run state?
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
@@ -300,13 +303,13 @@ public class StandardCommandHandler implements InputHandler {
 		try {
 			ServerHandle server = assistant.selectServer();
 			if( server != null ) {
-				System.out.println("Please enter a filesystem path of your deployment:");
+				provider.output("Please enter a filesystem path of your deployment:");
 				String filePath = assistant.nextLine().trim();
 				if( new File(filePath).exists()) {
 					DeployableReference ref = new DeployableReference(filePath, filePath);
 					ModifyDeployableRequest req = new ModifyDeployableRequest(server, ref);
 					Status ret = launcher.getServerProxy().addDeployable(req).get();
-					System.out.println(ret.toString());
+					provider.output(ret.toString());
 				}
 			}
 		} catch(InterruptedException | ExecutionException ioe) {
@@ -320,10 +323,10 @@ public class StandardCommandHandler implements InputHandler {
 		while (kit.hasNext()) {
 			String key = kit.next();
 			Attribute val = map.get(key);
-			System.out.println(key);
-			System.out.println("    type=" + val.getType());
-			System.out.println("    desc=" + val.getDescription());
-			System.out.println("    defaultVal=" + val.getDefaultVal());
+			provider.output(key);
+			provider.output("    type=" + val.getType());
+			provider.output("    desc=" + val.getDescription());
+			provider.output("    defaultVal=" + val.getDefaultVal());
 		}
 	}
 
@@ -333,41 +336,41 @@ public class StandardCommandHandler implements InputHandler {
 		
 		// This CLI will not actually launch this server locally. 
 		// We are just stubbing this out for now. 
-		System.out.println("We wont actually run this from the client here in this CLI.");
-		System.out.println("This Proof-of-concept will just simulate running it.");
+		provider.output("We wont actually run this from the client here in this CLI.");
+		provider.output("This Proof-of-concept will just simulate running it.");
 		
 
 		ServerStartingAttributes ssa = new ServerStartingAttributes(getLaunchReq, false);
 		Status status1 = launcher.getServerProxy().serverStartingByClient(ssa).get();
-		System.out.println(status1.toString());
+		provider.output(status1.toString());
 		Status status2 = launcher.getServerProxy().serverStartedByClient(getLaunchReq).get();
-		System.out.println(status2.toString());
+		provider.output(status2.toString());
 
 	}
 	private void printLocalLaunchCommandDetails(LaunchParameters getLaunchReq) throws Exception {
 		CommandLineDetails det = launcher.getServerProxy().getLaunchCommand(getLaunchReq).get();
 		if (det == null) {
-			System.out.println("The SSP returned no launch command for this request.");
+			provider.output("The SSP returned no launch command for this request.");
 			return;
 		}
 		String[] cmdline = det.getCmdLine();
 		String wd = det.getWorkingDir();
 		String[] envp = det.getEnvp();
 		
-		System.out.println("Got it.");
-		System.out.println("command: " + String.join(" ", cmdline));
+		provider.output("Got it.");
+		provider.output("command: " + String.join(" ", cmdline));
 	}
 
 	private LaunchParameters getLaunchCommandRequest() throws Exception {
-		System.out.println("Which server would you like to run?");
+		provider.output("Which server would you like to run?");
 		List<ServerHandle> handles = launcher.getServerProxy().getServerHandles().get();
 		for( ServerHandle sh : handles ) {
-			System.out.println("   " + sh.getId());
+			provider.output("   " + sh.getId());
 		}
 		String server = assistant.nextLine().trim();
 		ServerHandle handle = findServer(server);
 		if (handle == null) {
-			System.out.println("Server " + server + " not found.");
+			provider.output("Server " + server + " not found.");
 			return null;
 		}
 		String mode = assistant.selectLaunchMode(handle.getType());
@@ -398,14 +401,14 @@ public class StandardCommandHandler implements InputHandler {
 		try {
 			ServerType selected = assistant.chooseServerType();
 			if (selected == null) {
-				System.out.println("Canceling request.");
+				provider.output("Canceling request.");
 				return;
 			}
 			
-			System.out.println("Please choose a unique name: ");
+			provider.output("Please choose a unique name: ");
 			String name = assistant.nextLine();
 			if (name == null || name.isEmpty()) {
-				System.out.println("Name cannot be empty. Canceling request.");
+				provider.output("Name cannot be empty. Canceling request.");
 				return;
 			}
 			
@@ -417,18 +420,18 @@ public class StandardCommandHandler implements InputHandler {
 			assistant.promptForAttributes(required2, store, true);
 			assistant.promptForAttributes(optional2, store, false);
 			
-			System.out.println("Adding Server...");
+			provider.output("Adding Server...");
 			ServerAttributes csa = new ServerAttributes(selected.getId(), name, store);
 			CreateServerResponse result = launcher.getServerProxy().createServer(csa).get();
 			if (result.getStatus().isOK()) {
-				System.out.println("Server Added");
+				provider.output("Server Added");
 			} else {
 				while(assistant.updateInvalidAttributes(result, required2, optional2, store)) {
-					System.out.println("Adding Server...");
+					provider.output("Adding Server...");
 					csa = new ServerAttributes(selected.getId(), name, store);
 					result = launcher.getServerProxy().createServer(csa).get();
 					if (result.getStatus().isOK()) {
-						System.out.println("Server Added");
+						provider.output("Server Added");
 						return;
 					}
 				}
@@ -441,10 +444,10 @@ public class StandardCommandHandler implements InputHandler {
 	
 	
 	private void showCommands() {
-		System.out.println("Invalid Command");
-		System.out.println("Possible commands: ");
+		provider.output("Invalid Command");
+		provider.output("Possible commands: ");
 		for (int i = 0; i < CMD_ARR.length; i++) {
-			System.out.println("   " + CMD_ARR[i]);
+			provider.output("   " + CMD_ARR[i]);
 		}
 	}
 

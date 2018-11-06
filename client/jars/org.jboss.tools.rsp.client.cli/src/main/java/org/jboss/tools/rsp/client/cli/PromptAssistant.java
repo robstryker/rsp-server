@@ -39,7 +39,7 @@ public class PromptAssistant {
 		if( ret != null && opt2.contains(ret)) {
 			return opt2.indexOf(ret);
 		}
-		System.out.println("Invalid selection.");
+		provider.output("Invalid selection.");
 		return -1;
 	}
 	
@@ -100,9 +100,9 @@ public class PromptAssistant {
 
 	public String promptUser(List<String> list, String msg) {
 		int c = 1;
-		System.out.println(msg);
+		provider.output(msg);
 		for (String str : list) {
-			System.out.println(c++ + ") " + str);
+			provider.output(c++ + ") " + str);
 		}
 		String choice = nextLine().trim();
 		if( list.contains(choice))
@@ -113,7 +113,7 @@ public class PromptAssistant {
 		try {
 			num = Integer.parseInt(choice);
 		} catch(NumberFormatException nfe) {
-			System.out.println("User choice does not match an available option.");
+			provider.output("User choice does not match an available option.");
 			return null;
 		}
 		if( num -1 >= 0 && list.size() >= num) 
@@ -126,7 +126,7 @@ public class PromptAssistant {
 		Class c = getAttributeTypeAsClass(attrType);
 		String reqType = c.getName();
 		if (c == null) {
-			System.out.println("unknown attribute type " + attrType + ". Aborting.");
+			provider.output("unknown attribute type " + attrType + ". Aborting.");
 		}
 		String reqDesc = attrsUtil.getAttributeDescription(k);
 		Object defVal = attrsUtil.getAttributeDefaultValue(k);
@@ -137,10 +137,10 @@ public class PromptAssistant {
 		if (defVal != null) {
 			toPrint += "\nDefault Value: " + defVal.toString();
 		}
-		System.out.println(toPrint);
+		provider.output(toPrint);
 		if (!required2) {
 			if( !promptBoolean("Would you like to set this value? [y/n]") ) {
-				System.out.println("Skipping");
+				provider.output("Skipping");
 				return;
 			}
 		}
@@ -157,13 +157,13 @@ public class PromptAssistant {
 	}
 
 	public Map<String, String> promptMapValue() {
-		System.out.println("Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
+		provider.output("Please enter a map value. Each line should read some.key=some.val.\nSend a blank line to end the map.");
 		Map<String, String> map = new HashMap<>();
 		String tmp = nextLine();
 		while (!tmp.trim().isEmpty()) {
 			int ind = tmp.indexOf("=");
 			if (ind == -1) {
-				System.out.println("Invalid map entry. Please try again");
+				provider.output("Invalid map entry. Please try again");
 			} else {
 				String k1 = tmp.substring(0,  ind);
 				String v1 = tmp.substring(ind+1);
@@ -175,7 +175,7 @@ public class PromptAssistant {
 	}
 
 	public List<String> promptListValue() {
-		System.out.println("Please enter a list value. Send a blank line to end the list.");
+		provider.output("Please enter a list value. Send a blank line to end the list.");
 		List<String> arr = new ArrayList<String>();
 		String tmp = nextLine();
 		while (!tmp.trim().isEmpty()) {
@@ -186,18 +186,18 @@ public class PromptAssistant {
 	}
 
 	public Object promptPrimitiveValue(String type) {
-		System.out.println("Please enter a value: ");
+		provider.output("Please enter a value: ");
 		String val = nextLine();
 		return convertType(val, type);
 	}
 	
 
 	public boolean updateInvalidAttributes(CreateServerResponse result, Attributes required2, Attributes optional2, HashMap<String, Object> store ) {
-		System.out.println("Error adding server: " + result.getStatus().getMessage());
+		provider.output("Error adding server: " + result.getStatus().getMessage());
 		List<String> list = result.getInvalidKeys();
-		System.out.println("Invalid attributes: ");
+		provider.output("Invalid attributes: ");
 		for( int i = 0; i < list.size(); i++ ) {
-			System.out.println("   " + list.get(i));
+			provider.output("   " + list.get(i));
 		}
 		
 		boolean tryAgain = promptBoolean("Would you like to correct the invalid fields and try again? y/n");
@@ -212,7 +212,7 @@ public class PromptAssistant {
 	}
 	
 	public boolean promptBoolean(String msg) {
-		System.out.println(msg);
+		provider.output(msg);
 		String tryAgain = nextLine();
 		if (tryAgain == null || tryAgain.isEmpty() || tryAgain.toLowerCase().equals("n")) {
 			return false;

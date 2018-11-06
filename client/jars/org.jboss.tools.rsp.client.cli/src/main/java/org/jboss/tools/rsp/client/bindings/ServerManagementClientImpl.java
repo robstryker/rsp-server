@@ -42,27 +42,27 @@ public class ServerManagementClientImpl implements RSPClient {
 
 	@Override
 	public void discoveryPathAdded(DiscoveryPath message) {
-		System.out.println("Added discovery path: " + message.getFilepath());
+		inputProvider.output("Added discovery path: " + message.getFilepath());
 	}
 
 	@Override
 	public void discoveryPathRemoved(DiscoveryPath message) {
-		System.out.println("Removed discovery path: " + message.getFilepath());
+		inputProvider.output("Removed discovery path: " + message.getFilepath());
 	}
 	
 	@Override
 	public void serverAdded(ServerHandle server) {
-		System.out.println("Server added: " + server.getType() + ":" + server.getId());
+		inputProvider.output("Server added: " + server.getType() + ":" + server.getId());
 	}
 
 	@Override
 	public void serverRemoved(ServerHandle server) {
-		System.out.println("Server removed: " + server.getType() + ":" + server.getId());
+		inputProvider.output("Server removed: " + server.getType() + ":" + server.getId());
 	}
 
 	@Override
 	public void serverAttributesChanged(ServerHandle server) {
-		System.out.println("Server attribute changed: " + server.getType() + ":" + server.getId());
+		inputProvider.output("Server attribute changed: " + server.getType() + ":" + server.getId());
 	}
 
 	@Override
@@ -83,26 +83,26 @@ public class ServerManagementClientImpl implements RSPClient {
 			break;
 			
 		}
-		System.out.println("Server state changed: " + state.getServer().getType() + ":" + state.getServer().getId() + " to " + stateString);
+		inputProvider.output("Server state changed: " + state.getServer().getType() + ":" + state.getServer().getId() + " to " + stateString);
 	}
 
 	@Override
 	public void serverProcessCreated(ServerProcess process) {
-		System.out.println("Server process created: " + 
+		inputProvider.output("Server process created: " + 
 				process.getServer().getType() + ":" + process.getServer().getId() + " @ " 
 				+ process.getProcessId());
 	}
 
 	@Override
 	public void serverProcessTerminated(ServerProcess process) {
-		System.out.println("Server process terminated: " 
+		inputProvider.output("Server process terminated: " 
 				+ process.getServer().getType() + ":" + process.getServer().getId() + " @ " 
 				+ process.getProcessId());
 	}
 
 	@Override
 	public void serverProcessOutputAppended(ServerProcessOutput out) {
-		System.out.println("ServerOutput: " 
+		inputProvider.output("ServerOutput: " 
 				+ out.getServer().toString() + " ["
 				+ out.getProcessId() + "][" 
 				+ out.getStreamType() + "] " + out.getText());

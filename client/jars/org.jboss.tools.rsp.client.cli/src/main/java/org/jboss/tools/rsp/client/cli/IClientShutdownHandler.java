@@ -8,21 +8,6 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.client.cli;
 
-public interface InputProvider {
-	
-	/**
-	 * To be used when your input handler receives a 
-	 * request from another thread and does not yet have 
-	 * control or is not yet handling a given input string
-	 * 
-	 * @param handler
-	 */
-	public void addInputRequest(InputHandler handler);
-	
-	/**
-	 * Output something
-	 * @param out
-	 */
-	public void output(String out);
-
+public interface IClientShutdownHandler {
+	public void shutdown();
 }
