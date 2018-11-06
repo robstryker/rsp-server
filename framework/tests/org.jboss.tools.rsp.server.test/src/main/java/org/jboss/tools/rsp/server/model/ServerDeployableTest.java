@@ -62,6 +62,12 @@ public class ServerDeployableTest {
 
 	private static final DataLocationSysProp dataLocation = new DataLocationSysProp();
 
+	/* TODO: remove duplication from Server */
+	private static final String MEMENTO_DEPLOYABLES = "deployables";
+	private static final String MEMENTO_DEPLOYABLE = "deployable";
+	private static final String MEMENTO_DEPLOYABLE_LABEL = "label";
+	private static final String MEMENTO_DEPLOYABLE_PATH = "path";
+
 	@BeforeClass
 	public static void beforeClass() {
 		dataLocation.backup().set("ServerDeployableTest");
@@ -240,14 +246,14 @@ public class ServerDeployableTest {
 		try {
 			sm.saveServers();
 			JSONMemento memento = JSONMemento.loadMemento(new FileInputStream(serverFile));
-			IMemento[] modules = memento.getChildren("modules");
-			assertNotNull(modules);
-			assertEquals(1, modules.length);
-			IMemento[] module = modules[0].getChildren("module");
-			assertNotNull(module);
-			assertEquals(1, module.length);
-			assertEquals(DEPLOYABLE_LABEL, module[0].getString("id"));
-			assertEquals(war.getAbsolutePath(), module[0].getString("path"));
+			IMemento[] deployablesMemento = memento.getChildren(MEMENTO_DEPLOYABLES);
+			assertNotNull(deployablesMemento);
+			assertEquals(1, deployablesMemento.length);
+			IMemento[] deployableMemento = deployablesMemento[0].getChildren(MEMENTO_DEPLOYABLE);
+			assertNotNull(deployableMemento);
+			assertEquals(1, deployableMemento.length);
+			assertEquals(DEPLOYABLE_LABEL, deployableMemento[0].getString(MEMENTO_DEPLOYABLE_LABEL));
+			assertEquals(war.getAbsolutePath(), deployableMemento[0].getString(MEMENTO_DEPLOYABLE_PATH));
 		} catch(IOException | CoreException ioe) {
 			ioe.printStackTrace();
 			fail();
@@ -265,8 +271,8 @@ public class ServerDeployableTest {
 		try {
 			sm.saveServers();
 			JSONMemento memento = JSONMemento.loadMemento(new FileInputStream(serverFile));
-			IMemento[] modules = memento.getChildren("modules");
-			boolean dne = (modules == null || modules.length == 0);
+			IMemento[] deployablesMemento = memento.getChildren(MEMENTO_DEPLOYABLES);
+			boolean dne = (deployablesMemento == null || deployablesMemento.length == 0);
 			assertTrue(dne);
 		} catch(IOException | CoreException ioe) {
 			ioe.printStackTrace();
@@ -525,9 +531,9 @@ public class ServerDeployableTest {
 				"  \"id-set\": \"true\",\n" + 
 				"  \"org.jboss.tools.rsp.server.typeId\": \"" + type  + "\",\n" + 
 				"  \"id\": \"" + name + "\",\n" + 
-				"  \"modules\": {\n" + 
-				"    \"module\": {\n" + 
-				"      \"id\": \"some.name\",\n" + 
+				"  \"deployables\": {\n" + 
+				"    \"deployable\": {\n" + 
+				"      \"label\": \"some.name\",\n" + 
 				"      \"path\": \"/tmp/serverdeployabletest_deployments1557855048044620815/hello-world-war-1.0.0.war\"\n" + 
 				"    }\n" + 
 				"  }\n" + 
