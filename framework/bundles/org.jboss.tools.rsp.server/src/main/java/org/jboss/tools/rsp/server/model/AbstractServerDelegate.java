@@ -399,7 +399,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 					publishDeployable(state.getReference(), publishType, iState);
 					DeployableState postState = getServerPublishModel().getDeployableState(state.getReference());
 					
-					// If module was to be removed, and it was successfully removed, 
+					// If deployable was to be removed, and it was successfully removed, 
 					// clean it from the publish model cache entirely. 
 					if( iState == ServerManagementAPIConstants.PUBLISH_STATE_REMOVE) {
 						if( postState != null && postState.getPublishState() == ServerManagementAPIConstants.PUBLISH_STATE_NONE) {
@@ -410,7 +410,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 					String mod = state.getReference().getLabel();
 					String server = getServer().getName();
 					ms.add(new Status(IStatus.ERROR, ServerCoreActivator.BUNDLE_ID, 
-							NLS.bind("Error while publishing module {0} to server {1}", mod, server), ce)); 
+							NLS.bind("Error while publishing deployable {0} to server {1}", mod, server), ce)); 
 				}
 			}
 		} catch(CoreException ce) {
@@ -436,7 +436,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		// Clients override
 	}
 
-	protected void publishDeployable(DeployableReference reference, int publishType, int modulePublishType) throws CoreException {
+	protected void publishDeployable(DeployableReference reference, int publishType, int deployablemodulePublishType) throws CoreException {
 		// Clients should override this default implementation
 		setDeployablePublishState(reference, ServerManagementAPIConstants.PUBLISH_STATE_NONE);
 		setDeployableState(reference, ServerManagementAPIConstants.STATE_STARTED);

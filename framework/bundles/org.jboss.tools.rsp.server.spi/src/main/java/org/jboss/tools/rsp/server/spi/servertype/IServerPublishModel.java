@@ -62,7 +62,7 @@ public interface IServerPublishModel {
 	public void initialize(List<DeployableReference> references);
 
 	/**
-	 * Sets the publish state for a module. 
+	 * Sets the publish state for a deployable. 
 	 * Clients should call this method after publishing to update
 	 * the model with what the current state is.
 	 * @param reference

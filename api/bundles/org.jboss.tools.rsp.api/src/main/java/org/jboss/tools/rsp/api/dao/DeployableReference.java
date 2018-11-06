@@ -18,8 +18,8 @@ public class DeployableReference {
 	public DeployableReference() {
 	}
 
-	public DeployableReference(String id, String path) {
-		this.label = id;
+	public DeployableReference(String label, String path) {
+		this.label = label;
 		this.path = path;
 	}
 
