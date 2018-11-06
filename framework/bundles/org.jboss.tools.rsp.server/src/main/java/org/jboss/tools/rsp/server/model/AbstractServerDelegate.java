@@ -392,7 +392,7 @@ public abstract class AbstractServerDelegate implements IServerDelegate, IDebugE
 		MultiStatus ms = new MultiStatus(ServerCoreActivator.BUNDLE_ID, 0, "Publishing server " + getServer().getName(), null);
 		try {
 			publishStart(publishType);
-			List<DeployableState> list = getServerPublishModel().getDeployables();
+			List<DeployableState> list = getServerPublishModel().getDeployableStates();
 			for( DeployableState state : list ) {
 				try {
 					int iState = state.getPublishState();

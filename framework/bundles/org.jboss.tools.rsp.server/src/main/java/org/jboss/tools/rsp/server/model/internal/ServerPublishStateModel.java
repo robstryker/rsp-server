@@ -80,7 +80,7 @@ public class ServerPublishStateModel implements IServerPublishModel {
 	}
 
 	@Override
-	public List<DeployableState> getDeployables() {
+	public List<DeployableState> getDeployableStates() {
 		return new ArrayList<>(state.values());
 	}
 
