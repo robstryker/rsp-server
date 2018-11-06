@@ -8,7 +8,11 @@
  ******************************************************************************/
 package org.jboss.tools.rsp.client.cli;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +27,64 @@ import org.jboss.tools.rsp.client.bindings.ServerManagementClientLauncher;
 
 public class ServerManagementCLI implements InputProvider, IClientConnectionClosedListener {
 	public static void main(String[] args) {
+		defaultMain(args);
+		//programaticMain(args);
+	}
+	
+	private static void programaticMain(String[] args) {
+		// This is an example
+		String toRun = "list servers\ndelay 30\nexit\n";
+		String[] split = toRun.split("\n");
+		
+		ByteArrayOutputStream cliOut = new ByteArrayOutputStream();
+		PipedOutputStream cliInNested = new PipedOutputStream();
+		PipedInputStream cliIn = null;
+		try {
+			cliIn = new PipedInputStream(cliInNested);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
+		}
+		ServerManagementCLI cli = new ServerManagementCLI(null, cliIn, new PrintStream(cliOut));
+		try {
+			cli.connect(args[0], args[1]);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+
+		new Thread("Testing") {
+			public void run() {
+				for( String i : split ) {
+					if( i.startsWith("delay " )) {
+						String suffix = i.substring("delay ".length());
+						try {
+							int delayTime = Integer.parseInt(suffix.trim());
+							try {
+								Thread.sleep(delayTime*1000);
+							} catch(InterruptedException ie) {
+								ie.printStackTrace();
+							}
+						} catch(NumberFormatException nfe) {
+							nfe.printStackTrace();
+						}
+					} else {
+						try {
+							cliInNested.write(i.getBytes());
+							cliInNested.flush();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}.start();
+
+		cli.readInput();
+	}
+	
+	private static void defaultMain(String[] args) {
 		ServerManagementCLI cli = new ServerManagementCLI(null, System.in, System.out);
 		try {
 			cli.connect(args[0], args[1]);
@@ -32,6 +94,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 		}
 		cli.readInput();
 	}
+	
 
 	private Scanner scanner = null;
 	private ServerManagementClientLauncher launcher;
@@ -48,7 +111,7 @@ public class ServerManagementCLI implements InputProvider, IClientConnectionClos
 	}
 	public IClientShutdownHandler getShutdownHandler() {
 		if( shutdownHandler == null ) {
-			new IClientShutdownHandler() {
+			return new IClientShutdownHandler() {
 				@Override
 				public void shutdown() {
 					System.exit(0);
