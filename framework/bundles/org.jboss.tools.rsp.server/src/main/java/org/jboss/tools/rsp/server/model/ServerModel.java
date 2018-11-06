@@ -509,7 +509,7 @@ public class ServerModel implements IServerModel {
 	public List<DeployableState> getDeployables(IServer server) {
 		IServerDelegate s = serverDelegates.get(server.getId());
 		if( s != null ) {
-			return s.getServerPublishModel().getDeployables();
+			return s.getServerPublishModel().getDeployableStates();
 		}
 		return new ArrayList<DeployableState>();
 	}
