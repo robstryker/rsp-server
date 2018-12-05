@@ -11,7 +11,6 @@
 package org.jboss.tools.rsp.runtime.core;
 
 import org.jboss.tools.rsp.foundation.core.plugin.BaseCorePlugin;
-import org.jboss.tools.rsp.foundation.core.plugin.IPluginLog;
 import org.jboss.tools.rsp.foundation.core.plugin.StatusFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
@@ -68,19 +67,6 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 
 	public BundleContext getBundleContext() {
 		return context;
-	}
-	
-	
-	/**
-	 * Get the IPluginLog for this plugin. This method 
-	 * helps to make logging easier, for example:
-	 * 
-	 *     FoundationCorePlugin.pluginLog().logError(etc)
-	 *  
-	 * @return IPluginLog object
-	 */
-	public static IPluginLog pluginLog() {
-		return getDefault().pluginLogInternal();
 	}
 
 	/**

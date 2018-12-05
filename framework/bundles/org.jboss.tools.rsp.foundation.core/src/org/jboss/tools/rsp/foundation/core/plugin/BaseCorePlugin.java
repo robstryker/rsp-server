@@ -40,15 +40,8 @@ import org.osgi.framework.BundleContext;
 public class BaseCorePlugin implements BundleActivator {
 
 	private BundleContext bc = null;
-	private IPluginLog pluginLog = null;
 	private StatusFactory statusFactory = null;
-	
-	protected IPluginLog pluginLogInternal() {
-		if( pluginLog == null )
-			pluginLog = new PluginLog(this);
-		return pluginLog;
-	}
-	
+		
 	/**
 	 * Get a status factory for this plugin
 	 * @return status factory
@@ -71,9 +64,5 @@ public class BaseCorePlugin implements BundleActivator {
 	
 	public Bundle getBundle() {
 		return this.bc == null ? null : bc.getBundle();
-	}
-	
-	public IPluginLog getLog() {
-		return pluginLogInternal();
 	}
 }
