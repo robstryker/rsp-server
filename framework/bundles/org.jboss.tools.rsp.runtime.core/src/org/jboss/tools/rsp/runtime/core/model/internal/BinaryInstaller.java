@@ -36,11 +36,11 @@ public class BinaryInstaller implements IRuntimeInstaller {
 				try {
 					Files.copy(f.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				} catch(IOException ioe) {
-					throw new CoreException(RuntimeCoreActivator.statusFactory().errorStatus(ioe.getMessage(), ioe));
+					throw new CoreException(new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, ioe.getMessage(), ioe));
 				}
 			}
 			if (!dest.setExecutable(true)) {
-				throw new CoreException(RuntimeCoreActivator.statusFactory().errorStatus("Can't set executable bit to " + dest.getAbsolutePath()));
+				throw new CoreException(new Status(IStatus.ERROR, RuntimeCoreActivator.PLUGIN_ID, "Can't set executable bit to " + dest.getAbsolutePath()));
 			}
 			taskModel.putObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_HOME_DIRECTORY, unzipDirectory);
 			taskModel.putObject(IDownloadRuntimeWorkflowConstants.UNZIPPED_SERVER_BIN, dest.getAbsolutePath());

@@ -11,7 +11,6 @@
 package org.jboss.tools.rsp.runtime.core;
 
 import org.jboss.tools.rsp.foundation.core.plugin.BaseCorePlugin;
-import org.jboss.tools.rsp.foundation.core.plugin.StatusFactory;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
 import org.osgi.framework.BundleContext;
@@ -69,14 +68,6 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 		return context;
 	}
 
-	/**
-	 * Get a status factory for this plugin
-	 * @return status factory
-	 */
-	public static StatusFactory statusFactory() {
-		return getDefault().statusFactoryInternal();
-	}
-	
 	public static IDownloadRuntimesModel createDownloadRuntimesModel() {
 		return new DownloadRuntimesModel();
 	}

@@ -40,17 +40,6 @@ import org.osgi.framework.BundleContext;
 public class BaseCorePlugin implements BundleActivator {
 
 	private BundleContext bc = null;
-	private StatusFactory statusFactory = null;
-		
-	/**
-	 * Get a status factory for this plugin
-	 * @return status factory
-	 */
-	protected StatusFactory statusFactoryInternal() {
-		if( statusFactory == null ) 
-			statusFactory = new StatusFactory(getBundle().getSymbolicName());
-		return statusFactory;
-	}
 
 	@Override
 	public void start(BundleContext context) throws Exception {
