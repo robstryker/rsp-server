@@ -10,9 +10,9 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.runtime.core;
 
-import org.jboss.tools.rsp.foundation.core.plugin.BaseCorePlugin;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
 import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
  * 
  * @author snjeza
  */
-public class RuntimeCoreActivator extends BaseCorePlugin {
+public class RuntimeCoreActivator implements BundleActivator {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.jboss.tools.rsp.runtime.core"; //$NON-NLS-1$
@@ -41,7 +41,6 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
-		super.start(context);
 		plugin = this;
 		this.context = context;
 	}
@@ -52,7 +51,6 @@ public class RuntimeCoreActivator extends BaseCorePlugin {
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
-		super.stop(context);
 	}
 
 	/**
