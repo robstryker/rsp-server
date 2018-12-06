@@ -10,6 +10,8 @@
  ************************************************************************************/
 package org.jboss.tools.rsp.runtime.core;
 
+import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
+import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -24,5 +26,9 @@ public class RuntimeCoreActivator implements BundleActivator {
 	}
 
 	public void stop(BundleContext context) throws Exception {
+	}
+
+	public static IDownloadRuntimesModel createDownloadRuntimesModel() {
+		return new DownloadRuntimesModel();
 	}
 }
