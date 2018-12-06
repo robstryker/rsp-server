@@ -14,8 +14,8 @@ import org.jboss.tools.rsp.api.RSPClient;
 import org.jboss.tools.rsp.eclipse.jdt.launching.IVMInstallRegistry;
 import org.jboss.tools.rsp.eclipse.jdt.launching.VMInstallRegistry;
 import org.jboss.tools.rsp.launching.LaunchingCore;
-import org.jboss.tools.rsp.runtime.core.RuntimeCoreActivator;
 import org.jboss.tools.rsp.runtime.core.model.IDownloadRuntimesModel;
+import org.jboss.tools.rsp.runtime.core.model.internal.DownloadRuntimesModel;
 import org.jboss.tools.rsp.secure.model.ISecureStorageProvider;
 import org.jboss.tools.rsp.server.CapabilityManagement;
 import org.jboss.tools.rsp.server.discovery.DiscoveryPathModel;
@@ -149,7 +149,7 @@ public class ServerManagementModel implements IServerManagementModel {
 	}
 
 	private IDownloadRuntimesModel createDownloadRuntimesModel() {
-		return RuntimeCoreActivator.createDownloadRuntimesModel();
+		return new DownloadRuntimesModel();
 	}
 	private IFileWatcherService createFileWatcherService() {
 		return new FileWatcherService();
