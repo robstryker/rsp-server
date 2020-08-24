@@ -1,4 +1,4 @@
-#!/usr/bin/env groovy
+#!/usr/bin/env groovy   
 
 def default_java = "openjdk-1.8"
 def default_os = "rhel7"
