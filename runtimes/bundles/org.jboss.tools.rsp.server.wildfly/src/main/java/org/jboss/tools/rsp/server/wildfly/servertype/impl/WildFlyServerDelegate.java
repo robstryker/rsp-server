@@ -9,6 +9,7 @@
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.jboss.tools.rsp.server.spi.publishing.IFullPublishRequiredCallback;
 import org.jboss.tools.rsp.server.spi.publishing.IPublishController;
 import org.jboss.tools.rsp.server.spi.servertype.CreateServerValidation;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.spi.util.StatusConverter;
 import org.jboss.tools.rsp.server.wildfly.impl.Activator;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
@@ -71,6 +73,46 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 				new String[] {ServerManagementAPIConstants.SERVER_HOME_DIR});
 	}
 	@Override
+	public void setDependentDefaults(IServerWorkingCopy server) {
+		super.setDependentDefaults(server);
+		normalizeConfigFile(server);
+	}
+
+	private void normalizeConfigFile(IServerWorkingCopy server) {
+		String configFile = server.getAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, (String) null);
+		if (configFile == null || configFile.isEmpty()) {
+			return;
+		}
+		java.nio.file.Path configPath = Paths.get(configFile);
+		if (!configPath.isAbsolute()) {
+			return;
+		}
+		String home = server.getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
+		if (home == null) {
+			return;
+		}
+		String baseDir = server.getAttribute(IJBossServerAttributes.SERVER_BASE_DIR, IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT);
+		java.nio.file.Path configDir = getConfigurationDir(home, baseDir).toPath();
+		String relativized = configDir.relativize(configPath).toString();
+		server.setAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, relativized);
+	}
+
+	private File getConfigurationDir(String home, String baseDir) {
+		if (baseDir == null || baseDir.trim().isEmpty()) {
+			baseDir = IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT;
+		}
+		IPath homePath = new Path(home);
+		IPath baseDirPath = isRelativePath(baseDir) ? homePath.append(baseDir) : new Path(baseDir);
+		return baseDirPath.append("configuration").toFile();
+	}
+
+	private File getConfigurationDir(IServer server) {
+		String home = server.getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
+		String baseDir = server.getAttribute(IJBossServerAttributes.SERVER_BASE_DIR, IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT);
+		return getConfigurationDir(home, baseDir);
+	}
+
+	@Override
 	protected CreateServerValidation validate(IServer server) {
 		CreateServerValidation vd = super.validate(server);
 		if( !vd.getStatus().isOK()) {
@@ -89,11 +131,11 @@ public class WildFlyServerDelegate extends AbstractJBossServerDelegate {
 			return validationErrorResponse("Server's Base Directory must exist: " + baseDirPath.toString(), IJBossServerAttributes.SERVER_BASE_DIR, Activator.BUNDLE_ID);
 		}
 
-		String configFile = server.getAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
+		String configFile = server.getAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE,
 				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
-		IPath configFilePath = baseDirPath.append("configuration").append(configFile);
-		if( !configFilePath.toFile().exists()) {
-			return validationErrorResponse("Configuration file must exist: " + configFilePath, IJBossServerAttributes.WILDFLY_CONFIG_FILE, Activator.BUNDLE_ID);
+		File configFileResolved = new File(getConfigurationDir(server), configFile);
+		if( !configFileResolved.exists()) {
+			return validationErrorResponse("Configuration file must exist: " + configFileResolved.getAbsolutePath(), IJBossServerAttributes.WILDFLY_CONFIG_FILE, Activator.BUNDLE_ID);
 		}
 		return new CreateServerValidation(Status.OK_STATUS, null);
 	}

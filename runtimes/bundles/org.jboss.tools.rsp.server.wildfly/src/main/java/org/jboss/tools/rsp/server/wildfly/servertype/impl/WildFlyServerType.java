@@ -32,9 +32,9 @@ public class WildFlyServerType extends BaseJBossServerType {
 				"Set the base directory you want your WildFly instance to use. Path may be relative to the server home, or absolute.", 
 				IJBossServerAttributes.SERVER_BASE_DIR_DEFAULT);
 
-		attrs.addAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
-				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
-				"Set the configuration file you want your WildFly instance to use. Path must be relative to base directory's configuration folder.", 
+		attrs.addAttribute(IJBossServerAttributes.WILDFLY_CONFIG_FILE,
+				ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE,
+				"Set the configuration file for your WildFly instance. Absolute paths will be resolved relative to the configuration directory.",
 				IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT);
 
 		attrs.addAttribute(IJBossServerAttributes.WILDFLY_DEPLOY_DIR,
