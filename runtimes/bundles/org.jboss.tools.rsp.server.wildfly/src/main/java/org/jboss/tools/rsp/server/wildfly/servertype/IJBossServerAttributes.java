@@ -47,6 +47,9 @@ public interface IJBossServerAttributes extends DefaultServerAttributes {
 	public static final String LAUNCH_OVERRIDE_BOOLEAN = "args.override.boolean";
 	public static final String LAUNCH_OVERRIDE_PROGRAM_ARGS = "args.program.override.string";
 	public static final String LAUNCH_OVERRIDE_VM_ARGS = "args.vm.override.string";
+	public static final String SHUTDOWN_LAUNCH_OVERRIDE_BOOLEAN = "args.shutdown.override.boolean";
+	public static final String LAUNCH_OVERRIDE_SHUTDOWN_PROGRAM_ARGS = "args.shutdown.program.override.string";
+	public static final String LAUNCH_OVERRIDE_SHUTDOWN_VM_ARGS = "args.shutdown.vm.override.string";
 	public static final String LAUNCH_APPEND_ENV = AbstractJavaLauncher.PROPERTY_LAUNCH_ENV;
 	
 

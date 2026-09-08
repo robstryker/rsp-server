@@ -3,23 +3,30 @@
  * All rights reserved. This program is made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v20.html
- * 
+ *
  * Contributors: Red Hat, Inc.
  ******************************************************************************/
 package org.jboss.tools.rsp.server.wildfly.servertype.impl;
 
 import org.jboss.tools.rsp.eclipse.core.runtime.CoreException;
 import org.jboss.tools.rsp.eclipse.core.runtime.IPath;
+import org.jboss.tools.rsp.eclipse.core.runtime.NullProgressMonitor;
 import org.jboss.tools.rsp.eclipse.core.runtime.Path;
 import org.jboss.tools.rsp.eclipse.debug.core.ILaunch;
 import org.jboss.tools.rsp.server.spi.launchers.IServerShutdownLauncher;
+import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.servertype.IServerWorkingCopy;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractJBossServerDelegate;
 import org.jboss.tools.rsp.server.wildfly.servertype.AbstractLauncher;
 import org.jboss.tools.rsp.server.wildfly.servertype.IJBossServerAttributes;
 import org.jboss.tools.rsp.server.wildfly.servertype.launch.IDefaultLaunchArguments;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JBossASStopLauncher extends AbstractLauncher implements IServerShutdownLauncher {
+	private static final Logger LOG = LoggerFactory.getLogger(JBossASStopLauncher.class);
+
 	public JBossASStopLauncher(IServerDelegate jBossServerDelegate) {
 		super(jBossServerDelegate);
 	}
@@ -34,7 +41,7 @@ public class JBossASStopLauncher extends AbstractLauncher implements IServerShut
 	}
 
 	protected String getWorkingDirectory() {
-		String serverHome = getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
+		String serverHome = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
 		return serverHome + "/bin";
 	}
 
@@ -43,20 +50,66 @@ public class JBossASStopLauncher extends AbstractLauncher implements IServerShut
 	}
 
 	protected String[] getClasspath() {
-		String serverHome = getDelegate().getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
+		String serverHome = getServer().getAttribute(IJBossServerAttributes.SERVER_HOME, (String) null);
 		IPath jar = new Path(serverHome).append("bin").append("shutdown.jar");
 		return new String[] { jar.toOSString() };
 	}
 
 	protected String getVMArguments() {
-		return "";
+		boolean shouldOverride = getServer().getAttribute(IJBossServerAttributes.SHUTDOWN_LAUNCH_OVERRIDE_BOOLEAN, false);
+		if (shouldOverride) {
+			String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_SHUTDOWN_VM_ARGS, (String) null);
+			if (overrideArgs != null && overrideArgs.trim().length() > 0) {
+				return overrideArgs;
+			}
+		}
+
+		String ret = "";
+		if (shouldOverride) {
+			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_SHUTDOWN_VM_ARGS, ret);
+		}
+		return ret;
 	}
 
 	protected String getProgramArguments() {
+		boolean shouldOverride = getServer().getAttribute(IJBossServerAttributes.SHUTDOWN_LAUNCH_OVERRIDE_BOOLEAN, false);
+		if (shouldOverride) {
+			String overrideArgs = getServer().getAttribute(IJBossServerAttributes.LAUNCH_OVERRIDE_SHUTDOWN_PROGRAM_ARGS, (String) null);
+			if (overrideArgs != null && overrideArgs.trim().length() > 0) {
+				return overrideArgs;
+			}
+		}
+
+		String ret = calculateProgramArgs();
+		if (shouldOverride) {
+			saveProperty(IJBossServerAttributes.LAUNCH_OVERRIDE_SHUTDOWN_PROGRAM_ARGS, ret);
+		}
+		return ret;
+	}
+
+	private String calculateProgramArgs() {
 		IDefaultLaunchArguments largs = getLaunchArgs();
-		if( largs != null ) {
+		if (largs != null) {
 			return largs.getDefaultStopArgs();
 		}
 		return "";
+	}
+
+	private boolean isEqual(String one, String two) {
+		return one == null ? two == null : one.equals(two);
+	}
+
+	private void saveProperty(String key, String val) {
+		IServerWorkingCopy wc = getServer().createWorkingCopy();
+		wc.setAttribute(key, val);
+		try {
+			wc.save(new NullProgressMonitor());
+		} catch (CoreException ce) {
+			LOG.error(ce.getMessage(), ce);
+		}
+	}
+
+	public IServer getServer() {
+		return getDelegate().getServer();
 	}
 }
