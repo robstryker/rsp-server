@@ -170,7 +170,7 @@ public class WildFlyServerModelTest extends RSPCase {
         expected.put(IJBossServerAttributes.WILDFLY_CONFIG_FILE, 
         		new Attribute(
 					ServerManagementAPIConstants.ATTR_TYPE_LOCAL_FILE, 
-					"Set the configuration file you want your WildFly instance to use. Path must be relative to base directory's configuration folder.", 
+					"Set the configuration file for your WildFly instance. Absolute paths will be resolved relative to the configuration directory.", 
 					IJBossServerAttributes.WILDFLY_CONFIG_FILE_DEFAULT)
         		);
 		for( String k : expected.keySet()) {
