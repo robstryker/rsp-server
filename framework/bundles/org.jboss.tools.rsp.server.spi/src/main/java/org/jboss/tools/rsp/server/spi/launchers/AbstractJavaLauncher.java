@@ -32,6 +32,7 @@ import org.jboss.tools.rsp.launching.utils.LaunchingCommandLineDetails;
 import org.jboss.tools.rsp.launching.utils.NativeEnvironmentUtils;
 import org.jboss.tools.rsp.server.spi.servertype.IServer;
 import org.jboss.tools.rsp.server.spi.servertype.IServerDelegate;
+import org.jboss.tools.rsp.server.spi.util.VariableResolver;
 
 public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 	
@@ -126,6 +127,10 @@ public abstract class AbstractJavaLauncher implements IServerStartLauncher {
 		// null-safe
 		pgmArgs = (pgmArgs == null ? "" : pgmArgs);
 		vmArgs = (vmArgs == null ? "" : vmArgs);
+
+		// Resolve Eclipse-style variable references (e.g. ${env_var:NAME})
+		pgmArgs = VariableResolver.resolve(pgmArgs);
+		vmArgs = VariableResolver.resolve(vmArgs);
 
 		ExecutionArguments execArgs = new ExecutionArguments(vmArgs, pgmArgs);
 
